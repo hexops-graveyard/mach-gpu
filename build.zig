@@ -22,40 +22,41 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-
-    const glfw_dep = b.dependency("mach_glfw", .{
-        .target = example.target,
-        .optimize = example.optimize,
-    });
-    example.linkLibrary(glfw_dep.artifact("mach-glfw"));
-    example.addModule("glfw", glfw_dep.module("mach-glfw"));
-
     example.addModule("gpu", gpu.module(b));
     try gpu.link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
-
-    // TODO(build-system): package manager can't handle transitive deps like this, so we need to use
-    // these explicitly here:
-    @import("glfw").addPaths(example);
-    if (example.target.toTarget().isDarwin()) xcode_frameworks.addPaths(b, example);
-    example.linkLibrary(b.dependency("vulkan_headers", .{
-        .target = example.target,
-        .optimize = example.optimize,
-    }).artifact("vulkan-headers"));
-    example.linkLibrary(b.dependency("x11_headers", .{
-        .target = example.target,
-        .optimize = example.optimize,
-    }).artifact("x11-headers"));
-    example.linkLibrary(b.dependency("wayland_headers", .{
-        .target = example.target,
-        .optimize = example.optimize,
-    }).artifact("wayland-headers"));
-
+    glfwLink(b, example);
     b.installArtifact(example);
 
     const example_run_cmd = b.addRunArtifact(example);
     example_run_cmd.step.dependOn(b.getInstallStep());
     const example_run_step = b.step("run-example", "Run the example");
     example_run_step.dependOn(&example_run_cmd.step);
+}
+
+fn glfwLink(b: *std.Build, step: *std.build.CompileStep) void {
+    const glfw_dep = b.dependency("mach_glfw", .{
+        .target = step.target,
+        .optimize = step.optimize,
+    });
+    step.linkLibrary(glfw_dep.artifact("mach-glfw"));
+    step.addModule("glfw", glfw_dep.module("mach-glfw"));
+
+    // TODO(build-system): Zig package manager currently can't handle transitive deps like this, so we need to use
+    // these explicitly here:
+    @import("glfw").addPaths(step);
+    if (step.target.toTarget().isDarwin()) xcode_frameworks.addPaths(b, step);
+    step.linkLibrary(b.dependency("vulkan_headers", .{
+        .target = step.target,
+        .optimize = step.optimize,
+    }).artifact("vulkan-headers"));
+    step.linkLibrary(b.dependency("x11_headers", .{
+        .target = step.target,
+        .optimize = step.optimize,
+    }).artifact("x11-headers"));
+    step.linkLibrary(b.dependency("wayland_headers", .{
+        .target = step.target,
+        .optimize = step.optimize,
+    }).artifact("wayland-headers"));
 }
 
 pub fn Sdk(comptime deps: anytype) type {
