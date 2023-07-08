@@ -75,10 +75,6 @@ Join us in the [Mach Discord server](https://discord.gg/XNG3NZgCqp) to discuss t
 
 Issues are tracked in the [main Mach repository](https://github.com/hexops/mach/issues?q=is%3Aissue+is%3Aopen+label%3Agpu).
 
-## Contributing
-
-Contributions are very welcome. Pull requests must be sent to [the main repository](https://github.com/hexops/mach/tree/main/libs/gpu) to avoid some complex merge conflicts we'd get by accepting contributions in both repositories. Once the changes are merged there, they'll get sync'd to this repository automatically.
-
 ## Goals
 
 * Allow comptime-defined interception of WebGPU API requests (comptime interfaces.)
