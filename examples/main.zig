@@ -1,5 +1,5 @@
 const std = @import("std");
-const sample_utils = @import("sample_utils.zig");
+const util = @import("util.zig");
 const glfw = @import("glfw");
 const gpu = @import("gpu");
 
@@ -10,7 +10,7 @@ pub fn main() !void {
     var allocator = gpa.allocator();
 
     gpu.Impl.init();
-    const setup = try sample_utils.setup(allocator);
+    const setup = try setupWindow(allocator);
     const framebuffer_size = setup.window.getFramebufferSize();
 
     const window_data = try allocator.create(WindowData);
@@ -130,9 +130,6 @@ const FrameParams = struct {
 };
 
 fn frame(params: FrameParams) !void {
-    const pool = try sample_utils.AutoReleasePool.init();
-    defer sample_utils.AutoReleasePool.release(pool);
-
     glfw.pollEvents();
     const pl = params.window.getUserPointer(WindowData).?;
     if (pl.swap_chain == null or !std.meta.eql(pl.current_desc, pl.target_desc)) {
@@ -166,4 +163,82 @@ fn frame(params: FrameParams) !void {
     command.release();
     pl.swap_chain.?.present();
     back_buffer_view.release();
+}
+
+const Setup = struct {
+    instance: *gpu.Instance,
+    adapter: *gpu.Adapter,
+    device: *gpu.Device,
+    window: glfw.Window,
+    surface: *gpu.Surface,
+};
+
+/// Default GLFW error handling callback
+fn errorCallback(error_code: glfw.ErrorCode, description: [:0]const u8) void {
+    std.log.err("glfw: {}: {s}\n", .{ error_code, description });
+}
+
+pub fn setupWindow(allocator: std.mem.Allocator) !Setup {
+    const backend_type = try util.detectBackendType(allocator);
+
+    glfw.setErrorCallback(errorCallback);
+    if (!glfw.init(.{})) {
+        std.log.err("failed to initialize GLFW: {?s}", .{glfw.getErrorString()});
+        std.process.exit(1);
+    }
+
+    // Create the test window and discover adapters using it (esp. for OpenGL)
+    var hints = util.glfwWindowHintsForBackend(backend_type);
+    hints.cocoa_retina_framebuffer = true;
+    const window = glfw.Window.create(640, 480, "mach/gpu window", null, null, hints) orelse {
+        std.log.err("failed to create GLFW window: {?s}", .{glfw.getErrorString()});
+        std.process.exit(1);
+    };
+
+    if (backend_type == .opengl) glfw.makeContextCurrent(window);
+    if (backend_type == .opengles) glfw.makeContextCurrent(window);
+
+    const instance = gpu.createInstance(null);
+    if (instance == null) {
+        std.debug.print("failed to create GPU instance\n", .{});
+        std.process.exit(1);
+    }
+    const surface = try util.createSurfaceForWindow(instance.?, window, comptime util.detectGLFWOptions());
+
+    var response: util.RequestAdapterResponse = undefined;
+    instance.?.requestAdapter(&gpu.RequestAdapterOptions{
+        .compatible_surface = surface,
+        .power_preference = .undefined,
+        .force_fallback_adapter = false,
+    }, &response, util.requestAdapterCallback);
+    if (response.status != .success) {
+        std.debug.print("failed to create GPU adapter: {s}\n", .{response.message.?});
+        std.process.exit(1);
+    }
+
+    // Print which adapter we are using.
+    var props = std.mem.zeroes(gpu.Adapter.Properties);
+    response.adapter.getProperties(&props);
+    std.debug.print("found {s} backend on {s} adapter: {s}, {s}\n", .{
+        props.backend_type.name(),
+        props.adapter_type.name(),
+        props.name,
+        props.driver_description,
+    });
+
+    // Create a device with default limits/features.
+    const device = response.adapter.createDevice(null);
+    if (device == null) {
+        std.debug.print("failed to create GPU device\n", .{});
+        std.process.exit(1);
+    }
+
+    device.?.setUncapturedErrorCallback({}, util.printUnhandledErrorCallback);
+    return Setup{
+        .instance = instance.?,
+        .adapter = response.adapter,
+        .device = device.?,
+        .window = window,
+        .surface = surface,
+    };
 }

@@ -1,27 +1,19 @@
 const std = @import("std");
-const assert = std.debug.assert;
+
 const glfw = @import("glfw");
 const gpu = @import("gpu");
 const objc = @import("objc_message.zig");
 
-inline fn printUnhandledErrorCallback(_: void, typ: gpu.ErrorType, message: [*:0]const u8) void {
+pub inline fn printUnhandledErrorCallback(_: void, typ: gpu.ErrorType, message: [*:0]const u8) void {
     switch (typ) {
-        .validation => std.debug.print("gpu: validation error: {s}\n", .{message}),
-        .out_of_memory => std.debug.print("gpu: out of memory: {s}\n", .{message}),
-        .device_lost => std.debug.print("gpu: device lost: {s}\n", .{message}),
-        .unknown => std.debug.print("gpu: unknown error: {s}\n", .{message}),
+        .validation => std.log.err("gpu: validation error: {s}\n", .{message}),
+        .out_of_memory => std.log.err("gpu: out of memory: {s}\n", .{message}),
+        .device_lost => std.log.err("gpu: device lost: {s}\n", .{message}),
+        .unknown => std.log.err("gpu: unknown error: {s}\n", .{message}),
         else => unreachable,
     }
-    std.process.exit(1);
+    std.os.exit(1);
 }
-
-const Setup = struct {
-    instance: *gpu.Instance,
-    adapter: *gpu.Adapter,
-    device: *gpu.Device,
-    window: glfw.Window,
-    surface: *gpu.Surface,
-};
 
 fn getEnvVarOwned(allocator: std.mem.Allocator, key: []const u8) error{ OutOfMemory, InvalidUtf8 }!?[]u8 {
     return std.process.getEnvVarOwned(allocator, key) catch |err| switch (err) {
@@ -30,12 +22,11 @@ fn getEnvVarOwned(allocator: std.mem.Allocator, key: []const u8) error{ OutOfMem
     };
 }
 
-fn detectBackendType(allocator: std.mem.Allocator) !gpu.BackendType {
+pub fn detectBackendType(allocator: std.mem.Allocator) !gpu.BackendType {
     const MACH_GPU_BACKEND = try getEnvVarOwned(allocator, "MACH_GPU_BACKEND");
     if (MACH_GPU_BACKEND) |backend| {
         defer allocator.free(backend);
         if (std.ascii.eqlIgnoreCase(backend, "null")) return .null;
-        if (std.ascii.eqlIgnoreCase(backend, "webgpu")) return .null;
         if (std.ascii.eqlIgnoreCase(backend, "d3d11")) return .d3d11;
         if (std.ascii.eqlIgnoreCase(backend, "d3d12")) return .d3d12;
         if (std.ascii.eqlIgnoreCase(backend, "metal")) return .metal;
@@ -51,14 +42,14 @@ fn detectBackendType(allocator: std.mem.Allocator) !gpu.BackendType {
     return .vulkan;
 }
 
-const RequestAdapterResponse = struct {
+pub const RequestAdapterResponse = struct {
     status: gpu.RequestAdapterStatus,
     adapter: *gpu.Adapter,
     message: ?[*:0]const u8,
 };
 
-inline fn requestAdapterCallback(
-    context: *?RequestAdapterResponse,
+pub inline fn requestAdapterCallback(
+    context: *RequestAdapterResponse,
     status: gpu.RequestAdapterStatus,
     adapter: *gpu.Adapter,
     message: ?[*:0]const u8,
@@ -70,72 +61,7 @@ inline fn requestAdapterCallback(
     };
 }
 
-pub fn setup(allocator: std.mem.Allocator) !Setup {
-    const backend_type = try detectBackendType(allocator);
-
-    glfw.setErrorCallback(errorCallback);
-    if (!glfw.init(.{})) {
-        std.log.err("failed to initialize GLFW: {?s}", .{glfw.getErrorString()});
-        std.process.exit(1);
-    }
-
-    // Create the test window and discover adapters using it (esp. for OpenGL)
-    var hints = glfwWindowHintsForBackend(backend_type);
-    hints.cocoa_retina_framebuffer = true;
-    const window = glfw.Window.create(640, 480, "mach/gpu window", null, null, hints) orelse {
-        std.log.err("failed to create GLFW window: {?s}", .{glfw.getErrorString()});
-        std.process.exit(1);
-    };
-
-    if (backend_type == .opengl) glfw.makeContextCurrent(window);
-    if (backend_type == .opengles) glfw.makeContextCurrent(window);
-
-    const instance = gpu.createInstance(null);
-    if (instance == null) {
-        std.debug.print("failed to create GPU instance\n", .{});
-        std.process.exit(1);
-    }
-    const surface = createSurfaceForWindow(instance.?, window, comptime detectGLFWOptions());
-
-    var response: ?RequestAdapterResponse = null;
-    instance.?.requestAdapter(&gpu.RequestAdapterOptions{
-        .compatible_surface = surface,
-        .power_preference = .undefined,
-        .force_fallback_adapter = false,
-    }, &response, requestAdapterCallback);
-    if (response.?.status != .success) {
-        std.debug.print("failed to create GPU adapter: {s}\n", .{response.?.message.?});
-        std.process.exit(1);
-    }
-
-    // Print which adapter we are using.
-    var props = std.mem.zeroes(gpu.Adapter.Properties);
-    response.?.adapter.getProperties(&props);
-    std.debug.print("found {s} backend on {s} adapter: {s}, {s}\n", .{
-        props.backend_type.name(),
-        props.adapter_type.name(),
-        props.name,
-        props.driver_description,
-    });
-
-    // Create a device with default limits/features.
-    const device = response.?.adapter.createDevice(null);
-    if (device == null) {
-        std.debug.print("failed to create GPU device\n", .{});
-        std.process.exit(1);
-    }
-
-    device.?.setUncapturedErrorCallback({}, printUnhandledErrorCallback);
-    return Setup{
-        .instance = instance.?,
-        .adapter = response.?.adapter,
-        .device = device.?,
-        .window = window,
-        .surface = surface,
-    };
-}
-
-fn glfwWindowHintsForBackend(backend: gpu.BackendType) glfw.Window.Hints {
+pub fn glfwWindowHintsForBackend(backend: gpu.BackendType) glfw.Window.Hints {
     return switch (backend) {
         .opengl => .{
             // Ask for OpenGL 4.4 which is what the GL backend requires for compute shaders and
@@ -173,7 +99,7 @@ pub fn createSurfaceForWindow(
     instance: *gpu.Instance,
     window: glfw.Window,
     comptime glfw_options: glfw.BackendOptions,
-) *gpu.Surface {
+) !*gpu.Surface {
     const glfw_native = glfw.Native(glfw_options);
     const extension = if (glfw_options.win32) gpu.Surface.Descriptor.NextInChain{
         .from_windows_hwnd = &.{
@@ -185,7 +111,15 @@ pub fn createSurfaceForWindow(
             .display = glfw_native.getX11Display(),
             .window = glfw_native.getX11Window(window),
         },
+    } else if (glfw_options.wayland) gpu.Surface.Descriptor.NextInChain{
+        .from_wayland_surface = &.{
+            .display = glfw_native.getWaylandDisplay(),
+            .surface = glfw_native.getWaylandWindow(window),
+        },
     } else if (glfw_options.cocoa) blk: {
+        const pool = try AutoReleasePool.init();
+        defer AutoReleasePool.release(pool);
+
         const ns_window = glfw_native.getCocoaWindow(window);
         const ns_view = msgSend(ns_window, "contentView", .{}, *anyopaque); // [nsWindow contentView]
 
@@ -200,8 +134,6 @@ pub fn createSurfaceForWindow(
         msgSend(layer.?, "setContentsScale:", .{scale_factor}, void); // [layer setContentsScale:scale_factor]
 
         break :blk gpu.Surface.Descriptor.NextInChain{ .from_metal_layer = &.{ .layer = layer.? } };
-    } else if (glfw_options.wayland) {
-        @panic("TODO: this example does not support Wayland");
     } else unreachable;
 
     return instance.createSurface(&gpu.Surface.Descriptor{
@@ -237,21 +169,16 @@ pub const AutoReleasePool = if (!@import("builtin").target.isDarwin()) opaque {
     }
 };
 
-/// Default GLFW error handling callback
-fn errorCallback(error_code: glfw.ErrorCode, description: [:0]const u8) void {
-    std.log.err("glfw: {}: {s}\n", .{ error_code, description });
-}
-
 // Borrowed from https://github.com/hazeycode/zig-objcrt
 pub fn msgSend(obj: anytype, sel_name: [:0]const u8, args: anytype, comptime ReturnType: type) ReturnType {
     const args_meta = @typeInfo(@TypeOf(args)).Struct.fields;
 
     const FnType = switch (args_meta.len) {
-        0 => *const fn (@TypeOf(obj), objc.SEL) callconv(.C) ReturnType,
-        1 => *const fn (@TypeOf(obj), objc.SEL, args_meta[0].type) callconv(.C) ReturnType,
-        2 => *const fn (@TypeOf(obj), objc.SEL, args_meta[0].type, args_meta[1].type) callconv(.C) ReturnType,
-        3 => *const fn (@TypeOf(obj), objc.SEL, args_meta[0].type, args_meta[1].type, args_meta[2].type) callconv(.C) ReturnType,
-        4 => *const fn (@TypeOf(obj), objc.SEL, args_meta[0].type, args_meta[1].type, args_meta[2].type, args_meta[3].type) callconv(.C) ReturnType,
+        0 => *const fn (@TypeOf(obj), ?*objc.SEL) callconv(.C) ReturnType,
+        1 => *const fn (@TypeOf(obj), ?*objc.SEL, args_meta[0].type) callconv(.C) ReturnType,
+        2 => *const fn (@TypeOf(obj), ?*objc.SEL, args_meta[0].type, args_meta[1].type) callconv(.C) ReturnType,
+        3 => *const fn (@TypeOf(obj), ?*objc.SEL, args_meta[0].type, args_meta[1].type, args_meta[2].type) callconv(.C) ReturnType,
+        4 => *const fn (@TypeOf(obj), ?*objc.SEL, args_meta[0].type, args_meta[1].type, args_meta[2].type, args_meta[3].type) callconv(.C) ReturnType,
         else => @compileError("Unsupported number of args"),
     };
 
