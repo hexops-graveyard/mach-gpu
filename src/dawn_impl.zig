@@ -658,6 +658,10 @@ pub const Interface = struct {
         procs.deviceTick.?(@as(c.WGPUDevice, @ptrCast(device)));
     }
 
+    pub inline fn machDeviceWaitForCommandsToBeScheduled(device: *gpu.Device) void {
+        c.machDawnDeviceWaitForCommandsToBeScheduled(@ptrCast(device));
+    }
+
     pub inline fn deviceValidateTextureDescriptor(device: *gpu.Device, descriptor: *const gpu.Texture.Descriptor) void {
         procs.deviceValidateTextureDescriptor(device, descriptor);
     }

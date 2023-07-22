@@ -27,6 +27,7 @@ extern "C" {
 #include <dawn/dawn_proc_table.h>
 
 MACH_EXPORT const DawnProcTable machDawnGetProcTable();
+MACH_EXPORT void machDawnDeviceWaitForCommandsToBeScheduled(WGPUDevice device);
 
 #ifdef __cplusplus
 } // extern "C"

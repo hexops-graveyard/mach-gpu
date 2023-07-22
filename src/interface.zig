@@ -116,6 +116,7 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "deviceSetLoggingCallback", fn (device: *gpu.Device, callback: ?gpu.LoggingCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "deviceSetUncapturedErrorCallback", fn (device: *gpu.Device, callback: ?gpu.ErrorCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "deviceTick", fn (device: *gpu.Device) callconv(.Inline) void);
+    assertDecl(T, "machDeviceWaitForCommandsToBeScheduled", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "deviceReference", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "deviceRelease", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "externalTextureDestroy", fn (external_texture: *gpu.ExternalTexture) callconv(.Inline) void);
@@ -718,6 +719,11 @@ pub fn Export(comptime T: type) type {
         // WGPU_EXPORT void wgpuDeviceTick(WGPUDevice device);
         export fn wgpuDeviceTick(device: *gpu.Device) void {
             T.deviceTick(device);
+        }
+
+        // WGPU_EXPORT void wgpuMachDeviceWaitForCommandsToBeScheduled(WGPUDevice device);
+        export fn wgpuMachDeviceWaitForCommandsToBeScheduled(device: *gpu.Device) void {
+            T.machDeviceWaitForCommandsToBeScheduled(device);
         }
 
         // WGPU_EXPORT void wgpuDeviceReference(WGPUDevice device);
@@ -1844,6 +1850,11 @@ pub const StubInterface = Interface(struct {
     }
 
     pub inline fn deviceTick(device: *gpu.Device) void {
+        _ = device;
+        unreachable;
+    }
+
+    pub inline fn machDeviceWaitForCommandsToBeScheduled(device: *gpu.Device) void {
         _ = device;
         unreachable;
     }

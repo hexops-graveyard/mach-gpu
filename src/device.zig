@@ -343,6 +343,18 @@ pub const Device = opaque {
         Impl.deviceTick(device);
     }
 
+
+    // Mach WebGPU extension. Supported with mach-gpu-dawn.
+    //
+    // When making Metal interop with other APIs, we need to be careful that QueueSubmit doesn't
+    // mean that the operations will be visible to other APIs/Metal devices right away. macOS
+    // does have a global queue of graphics operations, but the command buffers are inserted there
+    // when they are "scheduled". Submitting other operations before the command buffer is
+    // scheduled could lead to races in who gets scheduled first and incorrect rendering.
+    pub inline fn machWaitForCommandsToBeScheduled(device: *Device) void {
+        Impl.machDeviceWaitForCommandsToBeScheduled(device);
+    }
+
     pub inline fn validateTextureDescriptor(device: *Device, descriptor: *const Texture.Descriptor) void {
         Impl.deviceVlidateTextureDescriptor(device, descriptor);
     }
