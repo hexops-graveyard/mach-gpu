@@ -3,16 +3,16 @@
     .version = "0.2.0",
     .dependencies = .{
         .mach_glfw = .{
-            .url = "https://pkg.machengine.org/mach-glfw/cfb49aa47d7785bc9d06df79f528b1a778d826da.tar.gz",
-            .hash = "1220f1c6ee8bcf8c7ef5cbabaac8e11a2e1492881bfce532f9fe15ff8de17e29512a",
+            .url = "https://pkg.machengine.org/mach-glfw/9c5d8ad53e534a51b590aa7bd1a3b16f0b14bc90.tar.gz",
+            .hash = "1220f0a5c98bff1e8273c0340051f0d5a4640029d26410df0e322014702c3b9b2bef",
         },
         .glfw = .{
-            .url = "https://pkg.machengine.org/glfw/06bd1276fb05c8bc999e104cf21c76788386f263.tar.gz",
-            .hash = "1220c4155e5e573bc39731e6e459cff44fb4a9c5fcf9087b5890a03cc349587d36ab",
+            .url = "https://pkg.machengine.org/glfw/f143c6e0d5f72c3a22d3a693ae82f3abe03a6caa.tar.gz",
+            .hash = "12205ac409b762a594efec201adf5080c02c511f359cf967eff6af2772b72350c152",
         },
         .direct3d_headers = .{
-            .url = "https://pkg.machengine.org/direct3d-headers/773dce3f079eecdccc7c71d1318a0741649d568b.tar.gz",
-            .hash = "12200d2155216c5eb5f111282cd355b5433cad6a68fd040294e695149cba329f7c12",
+            .url = "https://pkg.machengine.org/direct3d-headers/0da8bd6ffb495999d54309cd88a73275203f5041.tar.gz",
+            .hash = "12208468fa54ffe7978fcdeecca1ef1c7b01a0b5ee8ef2f4ca50ceb61997c87eacb3",
         },
         .vulkan_headers = .{
             .url = "https://pkg.machengine.org/vulkan-headers/e1b061ff624531e82a7daea5dbd56c07e08bf0be.tar.gz",
