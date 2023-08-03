@@ -90,8 +90,8 @@ pub fn Sdk(comptime deps: anytype) type {
         pub fn link(b: *std.Build, step: *std.build.CompileStep, options: Options) !void {
             if (step.target.toTarget().cpu.arch != .wasm32) {
                 try deps.gpu_dawn.link(b, step, options.gpu_dawn_options);
-                step.addCSourceFile(sdkPath("/src/mach_dawn.cpp"), &.{"-std=c++17"});
-                step.addIncludePath(sdkPath("/src"));
+                step.addCSourceFile(.{ .file = .{ .path = sdkPath("/src/mach_dawn.cpp") }, .flags = &.{"-std=c++17"} });
+                step.addIncludePath(.{ .path = sdkPath("/src") });
             }
         }
 
@@ -129,9 +129,9 @@ const xcode_frameworks = struct {
         // branch: mach
         xEnsureGitRepoCloned(b.allocator, "https://github.com/hexops/xcode-frameworks", "723aa55e9752c8c6c25d3413722b5fe13d72ac4f", xSdkPath("/zig-cache/xcode_frameworks")) catch |err| @panic(@errorName(err));
 
-        step.addFrameworkPath("zig-cache/xcode_frameworks/Frameworks");
-        step.addSystemIncludePath("zig-cache/xcode_frameworks/include");
-        step.addLibraryPath("zig-cache/xcode_frameworks/lib");
+        step.addFrameworkPath(.{ .path = "zig-cache/xcode_frameworks/Frameworks" });
+        step.addSystemIncludePath(.{ .path = "zig-cache/xcode_frameworks/include" });
+        step.addLibraryPath(.{ .path = "zig-cache/xcode_frameworks/lib" });
     }
 
     fn xEnsureGitRepoCloned(allocator: std.mem.Allocator, clone_url: []const u8, revision: []const u8, dir: []const u8) !void {
