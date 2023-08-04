@@ -2,6 +2,10 @@
     .name = "mach-gpu",
     .version = "0.2.0",
     .dependencies = .{
+        .mach_gpu_dawn = .{
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/ce6213fd0ce4fdff3754aeaa9bce7e28d239e30d.tar.gz",
+            .hash = "1220f314c12c284ec1693e262cc1af5004847ae47fdcbfe89baa0960a6ddb30017b5",
+        },
         .mach_glfw = .{
             .url = "https://pkg.machengine.org/mach-glfw/3b07e1a91da5641fb4e22e0aa55bd86f44d3b3ef.tar.gz",
             .hash = "1220f608a585bffc3911165792d554ad18eac11dd94ebe9262f791e8219542d60cc6",
@@ -25,6 +29,10 @@
         .x11_headers = .{
             .url = "https://pkg.machengine.org/x11-headers/4b87851e213eaf001d4a0e1ce2cf96ddbc93caed.tar.gz",
             .hash = "1220c3da8f10e4e48347ce4e20b42403decbca4026dc84b6c90a91ecae0377e6d4da",
+        },
+        .xcode_frameworks = .{
+            .url = "https://github.com/hexops/xcode-frameworks-pkg/archive/d486474a6af7fafd89e8314e0bf7eca4709f811b.tar.gz",
+            .hash = "1220293eae4bf67a7c27a18a8133621337cde91a97bc6859a9431b3b2d4217dfb5fb",
         },
     },
 }
