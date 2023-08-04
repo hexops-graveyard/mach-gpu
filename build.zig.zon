@@ -7,8 +7,8 @@
             .hash = "122099faf5fe3ff3c712d4bc1d3f9c2a352d48ac5552b699b7de1b2388ad7d8398e6",
         },
         .mach_glfw = .{
-            .url = "https://pkg.machengine.org/mach-glfw/66f89380ca8f40c46883e55cf7f7f3aa457bf6fd.tar.gz",
-            .hash = "122025a50ab9838961816530a43480d6e65cd43b723ad6d622b5bfe3ad039005dea5",
+            .url = "https://pkg.machengine.org/mach-glfw/4d59b4d4e24142d9fbb6ed742c6ba89918a00e63.tar.gz",
+            .hash = "12209838fcfb7a77d2d6931efdc7448c033a1b7dad11d082c94bbeeba9d1038cd3ff",
         },
         .glfw = .{
             .url = "https://pkg.machengine.org/glfw/b2f564195804b86f62efb33d48daa046f1d8ca43.tar.gz",

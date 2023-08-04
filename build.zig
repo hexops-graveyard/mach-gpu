@@ -25,40 +25,24 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     example.addModule("gpu", module);
+
     try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
-    glfwLink(b, example);
+
+    // Link GLFW
+    const glfw_dep = b.dependency(mach_glfw_import_path, .{
+        .target = target,
+        .optimize = optimize,
+    });
+    example.linkLibrary(glfw_dep.artifact("mach-glfw"));
+    example.addModule("glfw", glfw_dep.module("mach-glfw"));
+    try @import("mach_glfw").link(b, example);
+
     b.installArtifact(example);
 
     const example_run_cmd = b.addRunArtifact(example);
     example_run_cmd.step.dependOn(b.getInstallStep());
     const example_run_step = b.step("run-example", "Run the example");
     example_run_step.dependOn(&example_run_cmd.step);
-}
-
-fn glfwLink(b: *std.Build, step: *std.build.CompileStep) void {
-    const glfw_dep = b.dependency(mach_glfw_import_path, .{
-        .target = step.target,
-        .optimize = step.optimize,
-    });
-    step.linkLibrary(glfw_dep.artifact("mach-glfw"));
-    step.addModule("glfw", glfw_dep.module("mach-glfw"));
-
-    // TODO(build-system): Zig package manager currently can't handle transitive deps like this, so we need to use
-    // these explicitly here:
-    @import("glfw").addPaths(step);
-    if (step.target.toTarget().isDarwin()) @import("xcode_frameworks").addPaths(b, step);
-    step.linkLibrary(b.dependency("vulkan_headers", .{
-        .target = step.target,
-        .optimize = step.optimize,
-    }).artifact("vulkan-headers"));
-    step.linkLibrary(b.dependency("x11_headers", .{
-        .target = step.target,
-        .optimize = step.optimize,
-    }).artifact("x11-headers"));
-    step.linkLibrary(b.dependency("wayland_headers", .{
-        .target = step.target,
-        .optimize = step.optimize,
-    }).artifact("wayland-headers"));
 }
 
 pub fn testStep(b: *std.Build, optimize: std.builtin.OptimizeMode, target: std.zig.CrossTarget, options: Options) !*std.build.RunStep {
