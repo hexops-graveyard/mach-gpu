@@ -343,7 +343,6 @@ pub const Device = opaque {
         Impl.deviceTick(device);
     }
 
-
     // Mach WebGPU extension. Supported with mach-gpu-dawn.
     //
     // When making Metal interop with other APIs, we need to be careful that QueueSubmit doesn't
