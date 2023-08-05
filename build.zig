@@ -1,8 +1,6 @@
 const std = @import("std");
 const gpu_dawn = @import("mach_gpu_dawn");
 
-pub var mach_glfw_import_path: []const u8 = "mach_gpu_dawn.mach_glfw";
-
 pub fn build(b: *std.Build) !void {
     const optimize = b.standardOptimizeOption(.{});
     const target = b.standardTargetOptions(.{});
@@ -18,31 +16,35 @@ pub fn build(b: *std.Build) !void {
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
 
-    const example = b.addExecutable(.{
-        .name = "gpu-hello-triangle",
-        .root_source_file = .{ .path = "examples/main.zig" },
-        .target = target,
-        .optimize = optimize,
-    });
-    example.addModule("gpu", module);
+    // TODO: uncomment all this code once hexops/mach#902 is fixed, b.dependency("mach_glfw") cannot
+    // be called inside `pub fn build` if we want this package to be usable via the package manager.
+    _ = module;
 
-    try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
+    // const example = b.addExecutable(.{
+    //     .name = "gpu-hello-triangle",
+    //     .root_source_file = .{ .path = "examples/main.zig" },
+    //     .target = target,
+    //     .optimize = optimize,
+    // });
+    // example.addModule("gpu", module);
 
-    // Link GLFW
-    const glfw_dep = b.dependency(mach_glfw_import_path, .{
-        .target = target,
-        .optimize = optimize,
-    });
-    example.linkLibrary(glfw_dep.artifact("mach-glfw"));
-    example.addModule("glfw", glfw_dep.module("mach-glfw"));
-    try @import("mach_glfw").link(b, example);
+    // try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
 
-    b.installArtifact(example);
+    // // Link GLFW
+    // const glfw_dep = b.dependency("mach_glfw", .{
+    //     .target = target,
+    //     .optimize = optimize,
+    // });
+    // example.linkLibrary(glfw_dep.artifact("mach-glfw"));
+    // example.addModule("glfw", glfw_dep.module("mach-glfw"));
+    // try @import("mach_glfw").link(b, example);
 
-    const example_run_cmd = b.addRunArtifact(example);
-    example_run_cmd.step.dependOn(b.getInstallStep());
-    const example_run_step = b.step("run-example", "Run the example");
-    example_run_step.dependOn(&example_run_cmd.step);
+    // b.installArtifact(example);
+
+    // const example_run_cmd = b.addRunArtifact(example);
+    // example_run_cmd.step.dependOn(b.getInstallStep());
+    // const example_run_step = b.step("run-example", "Run the example");
+    // example_run_step.dependOn(&example_run_cmd.step);
 }
 
 pub fn testStep(b: *std.Build, optimize: std.builtin.OptimizeMode, target: std.zig.CrossTarget, options: Options) !*std.build.RunStep {
