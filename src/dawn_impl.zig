@@ -248,15 +248,6 @@ pub const Interface = struct {
         );
     }
 
-    pub inline fn commandEncoderCopyTextureToTextureInternal(command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) void {
-        procs.commandEncoderCopyTextureToTextureInternal.?(
-            @as(c.WGPUCommandEncoder, @ptrCast(command_encoder)),
-            @as(*const c.WGPUImageCopyTexture, @ptrCast(source)),
-            @as(*const c.WGPUImageCopyTexture, @ptrCast(destination)),
-            @as(*const c.WGPUExtent3D, @ptrCast(copy_size)),
-        );
-    }
-
     pub inline fn commandEncoderFinish(command_encoder: *gpu.CommandEncoder, descriptor: ?*const gpu.CommandBuffer.Descriptor) *gpu.CommandBuffer {
         return @as(*gpu.CommandBuffer, @ptrCast(procs.commandEncoderFinish.?(
             @as(c.WGPUCommandEncoder, @ptrCast(command_encoder)),

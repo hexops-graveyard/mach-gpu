@@ -194,6 +194,10 @@ pub const BlendFactor = enum(u32) {
     src_alpha_saturated = 0x0000000A,
     constant = 0x0000000B,
     one_minus_constant = 0x0000000C,
+    src1 = 0x0000000D,
+    one_minus_src1 = 0x0000000E,
+    src1_alpha = 0x0000000F,
+    one_minus_src1_alpha = 0x00000010,
 };
 
 pub const BlendOperation = enum(u32) {
@@ -288,6 +292,8 @@ pub const FeatureName = enum(u32) {
     surface_capabilities = 0x000003F0,
     transient_attachments = 0x000003F1,
     msaa_render_to_single_sampled = 0x000003F2,
+    dual_source_blending = 0x000003F3,
+    d3D11_multithread_protected = 0x000003F4,
 };
 
 pub const FilterMode = enum(u32) {
@@ -563,7 +569,7 @@ pub const Color = extern struct {
 
 pub const Extent2D = extern struct {
     width: u32,
-    height: u32 = 1,
+    height: u32,
 };
 
 pub const Extent3D = extern struct {
@@ -935,22 +941,22 @@ pub const RequestDeviceCallback = *const fn (
 
 pub const RequestAdapterCallback = *const fn (
     status: RequestAdapterStatus,
-    adapter: *Adapter,
+    adapter: ?*Adapter,
     message: ?[*:0]const u8,
     userdata: ?*anyopaque,
 ) callconv(.C) void;
 
 pub const CreateComputePipelineAsyncCallback = *const fn (
     status: CreatePipelineAsyncStatus,
-    compute_pipeline: *ComputePipeline,
-    message: [*:0]const u8,
+    compute_pipeline: ?*ComputePipeline,
+    message: ?[*:0]const u8,
     userdata: ?*anyopaque,
 ) callconv(.C) void;
 
 pub const CreateRenderPipelineAsyncCallback = *const fn (
     status: CreatePipelineAsyncStatus,
-    pipeline: *RenderPipeline,
-    message: [*:0]const u8,
+    pipeline: ?*RenderPipeline,
+    message: ?[*:0]const u8,
     userdata: ?*anyopaque,
 ) callconv(.C) void;
 

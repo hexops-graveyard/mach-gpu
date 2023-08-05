@@ -54,12 +54,6 @@ pub const CommandEncoder = opaque {
         Impl.commandEncoderCopyTextureToTexture(command_encoder, source, destination, copy_size);
     }
 
-    // Note: the only difference between this and the non-internal variant is that this one checks
-    // internal usage.
-    pub inline fn copyTextureToTextureInternal(command_encoder: *CommandEncoder, source: *const ImageCopyTexture, destination: *const ImageCopyTexture, copy_size: *const Extent3D) void {
-        Impl.commandEncoderCopyTextureToTextureInternal(command_encoder, source, destination, copy_size);
-    }
-
     pub inline fn finish(command_encoder: *CommandEncoder, descriptor: ?*const CommandBuffer.Descriptor) *CommandBuffer {
         return Impl.commandEncoderFinish(command_encoder, descriptor);
     }

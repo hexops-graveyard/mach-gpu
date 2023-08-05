@@ -54,7 +54,6 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "commandEncoderCopyBufferToTexture", fn (command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyBuffer, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) callconv(.Inline) void);
     assertDecl(T, "commandEncoderCopyTextureToBuffer", fn (command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyBuffer, copy_size: *const gpu.Extent3D) callconv(.Inline) void);
     assertDecl(T, "commandEncoderCopyTextureToTexture", fn (command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) callconv(.Inline) void);
-    assertDecl(T, "commandEncoderCopyTextureToTextureInternal", fn (command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) callconv(.Inline) void);
     assertDecl(T, "commandEncoderFinish", fn (command_encoder: *gpu.CommandEncoder, descriptor: ?*const gpu.CommandBuffer.Descriptor) callconv(.Inline) *gpu.CommandBuffer);
     assertDecl(T, "commandEncoderInjectValidationError", fn (command_encoder: *gpu.CommandEncoder, message: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "commandEncoderInsertDebugMarker", fn (command_encoder: *gpu.CommandEncoder, marker_label: [*:0]const u8) callconv(.Inline) void);
@@ -416,11 +415,6 @@ pub fn Export(comptime T: type) type {
         // WGPU_EXPORT void wgpuCommandEncoderCopyTextureToTexture(WGPUCommandEncoder commandEncoder, WGPUImageCopyTexture const * source, WGPUImageCopyTexture const * destination, WGPUExtent3D const * copySize);
         export fn wgpuCommandEncoderCopyTextureToTexture(command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) void {
             T.commandEncoderCopyTextureToTexture(command_encoder, source, destination, copy_size);
-        }
-
-        // WGPU_EXPORT void wgpuCommandEncoderCopyTextureToTextureInternal(WGPUCommandEncoder commandEncoder, WGPUImageCopyTexture const * source, WGPUImageCopyTexture const * destination, WGPUExtent3D const * copySize);
-        export fn wgpuCommandEncoderCopyTextureToTextureInternal(command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) void {
-            T.commandEncoderCopyTextureToTextureInternal(command_encoder, source, destination, copy_size);
         }
 
         // WGPU_EXPORT WGPUCommandBuffer wgpuCommandEncoderFinish(WGPUCommandEncoder commandEncoder, WGPUCommandBufferDescriptor const * descriptor /* nullable */);
@@ -1466,14 +1460,6 @@ pub const StubInterface = Interface(struct {
     }
 
     pub inline fn commandEncoderCopyTextureToTexture(command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) void {
-        _ = command_encoder;
-        _ = source;
-        _ = destination;
-        _ = copy_size;
-        unreachable;
-    }
-
-    pub inline fn commandEncoderCopyTextureToTextureInternal(command_encoder: *gpu.CommandEncoder, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D) void {
         _ = command_encoder;
         _ = source;
         _ = destination;
