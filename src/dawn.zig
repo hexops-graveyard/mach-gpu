@@ -11,7 +11,7 @@ pub const CacheDeviceDescriptor = extern struct {
 
 pub const EncoderInternalUsageDescriptor = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .dawn_encoder_internal_usage_descriptor },
-    use_internal_usages: bool = false,
+    use_internal_usages: bool align(32) = false,
 };
 
 pub const MultisampleStateRenderToSingleSampled = extern struct {

@@ -33,7 +33,7 @@ pub const ExternalTexture = opaque {
         src_transform_function_parameters: *const [7]f32,
         dst_transform_function_parameters: *const [7]f32,
         gamut_conversion_matrix: *const [9]f32,
-        flip_y: bool,
+        flip_y: bool align(32),
         rotation: Rotation,
     };
 

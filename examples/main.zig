@@ -218,7 +218,7 @@ pub fn setupWindow(allocator: std.mem.Allocator) !Setup {
 
     // Print which adapter we are using.
     var props = std.mem.zeroes(gpu.Adapter.Properties);
-    response.adapter.getProperties(&props);
+    response.adapter.?.getProperties(&props);
     std.debug.print("found {s} backend on {s} adapter: {s}, {s}\n", .{
         props.backend_type.name(),
         props.adapter_type.name(),
@@ -227,7 +227,7 @@ pub fn setupWindow(allocator: std.mem.Allocator) !Setup {
     });
 
     // Create a device with default limits/features.
-    const device = response.adapter.createDevice(null);
+    const device = response.adapter.?.createDevice(null);
     if (device == null) {
         std.debug.print("failed to create GPU device\n", .{});
         std.process.exit(1);
@@ -236,7 +236,7 @@ pub fn setupWindow(allocator: std.mem.Allocator) !Setup {
     device.?.setUncapturedErrorCallback({}, util.printUnhandledErrorCallback);
     return Setup{
         .instance = instance.?,
-        .adapter = response.adapter,
+        .adapter = response.adapter.?,
         .device = device.?,
         .window = window,
         .surface = surface,

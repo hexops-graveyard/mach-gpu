@@ -43,7 +43,7 @@ pub const Adapter = opaque {
         driver_description: [*:0]const u8,
         adapter_type: Type,
         backend_type: BackendType,
-        compatibility_mode: bool = false,
+        compatibility_mode: bool align(32) = false,
     };
 
     pub inline fn createDevice(adapter: *Adapter, descriptor: ?*const Device.Descriptor) ?*Device {

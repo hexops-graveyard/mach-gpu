@@ -21,6 +21,8 @@ pub const RenderPassEncoder = @import("render_pass_encoder.zig").RenderPassEncod
 pub const RenderPipeline = @import("render_pipeline.zig").RenderPipeline;
 pub const Sampler = @import("sampler.zig").Sampler;
 pub const ShaderModule = @import("shader_module.zig").ShaderModule;
+pub const SharedTextureMemory = @import("shared_texture_memory.zig").SharedTextureMemory;
+pub const SharedFence = @import("shared_fence.zig").SharedFence;
 pub const Surface = @import("surface.zig").Surface;
 pub const SwapChain = @import("swap_chain.zig").SwapChain;
 pub const Texture = @import("texture.zig").Texture;
@@ -67,11 +69,11 @@ pub const RenderPassDepthStencilAttachment = extern struct {
     depth_load_op: LoadOp = .undefined,
     depth_store_op: StoreOp = .undefined,
     depth_clear_value: f32 = 0,
-    depth_read_only: bool = false,
+    depth_read_only: bool align(32) = false,
     stencil_load_op: LoadOp = .undefined,
     stencil_store_op: StoreOp = .undefined,
     stencil_clear_value: u32 = 0,
-    stencil_read_only: bool = false,
+    stencil_read_only: bool align(32) = false,
 };
 
 pub const RenderPassTimestampWrite = extern struct {
@@ -90,8 +92,8 @@ pub const RequestAdapterOptions = extern struct {
     compatible_surface: ?*Surface = null,
     power_preference: PowerPreference = .undefined,
     backend_type: BackendType = .undefined,
-    force_fallback_adapter: bool = false,
-    compatibility_mode: bool = false,
+    force_fallback_adapter: bool align(32) = false,
+    compatibility_mode: bool align(32) = false,
 };
 
 pub const ComputePassDescriptor = extern struct {
@@ -293,7 +295,32 @@ pub const FeatureName = enum(u32) {
     transient_attachments = 0x000003F1,
     msaa_render_to_single_sampled = 0x000003F2,
     dual_source_blending = 0x000003F3,
-    d3D11_multithread_protected = 0x000003F4,
+    d3d11_multithread_protected = 0x000003F4,
+    anglet_exture_sharing = 0x000003F5,
+    shared_texture_memory_vk_image_descriptor = 0x0000044C,
+    shared_texture_memory_vk_dedicated_allocation_descriptor = 0x0000044D,
+    shared_texture_memory_a_hardware_buffer_descriptor = 0x0000044_E,
+    shared_texture_memory_dma_buf_descriptor = 0x0000044F,
+    shared_texture_memory_opaque_fd_descriptor = 0x00000450,
+    shared_texture_memory_zircon_handle_descriptor = 0x00000451,
+    shared_texture_memory_dxgi_shared_handle_descriptor = 0x00000452,
+    shared_texture_memory_d3_d11_texture2_d_descriptor = 0x00000453,
+    shared_texture_memory_io_surface_descriptor = 0x00000454,
+    shared_texture_memory_egl_image_descriptor = 0x00000455,
+    shared_texture_memory_initialized_begin_state = 0x000004B0,
+    shared_texture_memory_initialized_end_state = 0x000004B1,
+    shared_texture_memory_vk_image_layout_begin_state = 0x000004B2,
+    shared_texture_memory_vk_image_layout_end_state = 0x000004B3,
+    shared_fence_vk_semaphore_opaque_fd_descriptor = 0x000004B4,
+    shared_fence_vk_semaphore_opaque_fd_export_info = 0x000004B5,
+    shared_fence_vk_semaphore_sync_fd_descriptor = 0x000004B6,
+    shared_fence_vk_semaphore_sync_fd_export_info = 0x000004B7,
+    shared_fence_vk_semaphore_zircon_handle_descriptor = 0x000004B8,
+    shared_fence_vk_semaphore_zircon_handle_export_info = 0x000004B9,
+    shared_fence_dxgi_shared_handle_descriptor = 0x000004BA,
+    shared_fence_dxgi_shared_handle_export_info = 0x000004BB,
+    shared_fence_mtl_shared_event_descriptor = 0x000004BC,
+    shared_fence_mtl_shared_event_export_info = 0x000004BD,
 };
 
 pub const FilterMode = enum(u32) {
@@ -410,6 +437,30 @@ pub const SType = enum(u32) {
     request_adapter_options_get_gl_proc = 0x000003F3,
     dawn_multisample_state_render_to_single_sampled = 0x000003F4,
     dawn_render_pass_color_attachment_render_to_single_sampled = 0x000003F5,
+    shared_texture_memory_vk_image_descriptor = 0x0000044C,
+    shared_texture_memory_vk_dedicated_allocation_descriptor = 0x0000044D,
+    shared_texture_memory_a_hardware_buffer_descriptor = 0x0000044E,
+    shared_texture_memory_dma_buf_descriptor = 0x0000044F,
+    shared_texture_memory_opaque_fd_descriptor = 0x00000450,
+    shared_texture_memory_zircon_handle_descriptor = 0x00000451,
+    shared_texture_memory_dxgi_shared_handle_descriptor = 0x00000452,
+    shared_texture_memory_d3d11_texture_2d_descriptor = 0x00000453,
+    shared_texture_memory_io_surface_descriptor = 0x00000454,
+    shared_texture_memory_egl_image_descriptor = 0x00000455,
+    shared_texture_memory_initialized_begin_state = 0x000004B0,
+    shared_texture_memory_initialized_end_state = 0x000004B1,
+    shared_texture_memory_vk_image_layout_begin_state = 0x000004B2,
+    shared_texture_memory_vk_image_layout_end_state = 0x000004B3,
+    shared_fence_vk_semaphore_opaque_fd_descriptor = 0x000004B4,
+    shared_fence_vk_semaphore_opaque_fd_export_info = 0x000004B5,
+    shared_fence_vk_semaphore_syncfd_descriptor = 0x000004B6,
+    shared_fence_vk_semaphore_sync_fd_export_info = 0x000004B7,
+    shared_fence_vk_semaphore_zircon_handle_descriptor = 0x000004B8,
+    shared_fence_vk_semaphore_zircon_handle_export_info = 0x000004B9,
+    shared_fence_dxgi_shared_handle_descriptor = 0x000004BA,
+    shared_fence_dxgi_shared_handle_export_info = 0x000004BB,
+    shared_fence_mtl_shared_event_descriptor = 0x000004BC,
+    shared_fence_mtl_shared_event_export_info = 0x000004BD,
 };
 
 pub const StencilOperation = enum(u32) {
@@ -645,14 +696,14 @@ pub const ConstantEntry = extern struct {
 
 pub const CopyTextureForBrowserOptions = extern struct {
     next_in_chain: ?*const ChainedStruct = null,
-    flip_y: bool = false,
-    needs_color_space_conversion: bool = false,
+    flip_y: bool align(32) = false,
+    needs_color_space_conversion: bool align(32) = false,
     src_alpha_mode: AlphaMode = .unpremultiplied,
     src_transfer_function_parameters: ?*const [7]f32 = null,
     conversion_matrix: ?*const [9]f32 = null,
     dst_transfer_function_parameters: ?*const [7]f32 = null,
     dst_alpha_mode: AlphaMode = .unpremultiplied,
-    internal_usage: bool = false,
+    internal_usage: bool align(32) = false,
 };
 
 pub const MultisampleState = extern struct {
@@ -664,12 +715,12 @@ pub const MultisampleState = extern struct {
     next_in_chain: NextInChain = .{ .generic = null },
     count: u32 = 1,
     mask: u32 = 0xFFFFFFFF,
-    alpha_to_coverage_enabled: bool = false,
+    alpha_to_coverage_enabled: bool align(32) = false,
 };
 
 pub const PrimitiveDepthClipControl = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .primitive_depth_clip_control },
-    unclipped_depth: bool = false,
+    unclipped_depth: bool align(32) = false,
 };
 
 pub const PrimitiveState = extern struct {
