@@ -44,14 +44,14 @@ pub fn detectBackendType(allocator: std.mem.Allocator) !gpu.BackendType {
 
 pub const RequestAdapterResponse = struct {
     status: gpu.RequestAdapterStatus,
-    adapter: *gpu.Adapter,
+    adapter: ?*gpu.Adapter,
     message: ?[*:0]const u8,
 };
 
 pub inline fn requestAdapterCallback(
     context: *RequestAdapterResponse,
     status: gpu.RequestAdapterStatus,
-    adapter: *gpu.Adapter,
+    adapter: ?*gpu.Adapter,
     message: ?[*:0]const u8,
 ) void {
     context.* = RequestAdapterResponse{

@@ -63,7 +63,7 @@ pub const Buffer = opaque {
     pub const BindingLayout = extern struct {
         next_in_chain: ?*const ChainedStruct = null,
         type: BindingType = .undefined,
-        has_dynamic_offset: bool = false,
+        has_dynamic_offset: bool align(32) = false,
         min_binding_size: u64 = 0,
     };
 
@@ -77,7 +77,7 @@ pub const Buffer = opaque {
         label: ?[*:0]const u8 = null,
         usage: UsageFlags,
         size: u64,
-        mapped_at_creation: bool = false,
+        mapped_at_creation: bool align(32) = false,
     };
 
     pub inline fn destroy(buffer: *Buffer) void {

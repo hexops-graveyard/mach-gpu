@@ -12,12 +12,12 @@ extern "C" {
 #endif
 
 MACH_EXPORT const DawnProcTable machDawnGetProcTable() {
-    return dawn_native::GetProcs();
+    return dawn::native::GetProcs();
 }
 
 MACH_EXPORT void machDawnDeviceWaitForCommandsToBeScheduled(WGPUDevice device) {
     #if defined(__APPLE__)
-        return dawn_native::metal::WaitForCommandsToBeScheduled(device);
+        return dawn::native::metal::WaitForCommandsToBeScheduled(device);
     #else
         return;
     #endif  // defined(__APPLE__)

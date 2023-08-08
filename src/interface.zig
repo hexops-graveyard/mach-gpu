@@ -22,9 +22,9 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "adapterCreateDevice", fn (adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor) callconv(.Inline) ?*gpu.Device);
     assertDecl(T, "adapterEnumerateFeatures", fn (adapter: *gpu.Adapter, features: ?[*]gpu.FeatureName) callconv(.Inline) usize);
     assertDecl(T, "adapterGetInstance", fn (adapter: *gpu.Adapter) callconv(.Inline) *gpu.Instance);
-    assertDecl(T, "adapterGetLimits", fn (adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) callconv(.Inline) bool);
+    assertDecl(T, "adapterGetLimits", fn (adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) callconv(.Inline) u32);
     assertDecl(T, "adapterGetProperties", fn (adapter: *gpu.Adapter, properties: *gpu.Adapter.Properties) callconv(.Inline) void);
-    assertDecl(T, "adapterHasFeature", fn (adapter: *gpu.Adapter, feature: gpu.FeatureName) callconv(.Inline) bool);
+    assertDecl(T, "adapterHasFeature", fn (adapter: *gpu.Adapter, feature: gpu.FeatureName) callconv(.Inline) u32);
     assertDecl(T, "adapterRequestDevice", fn (adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor, callback: gpu.RequestDeviceCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "adapterReference", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
     assertDecl(T, "adapterRelease", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
@@ -104,9 +104,11 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "deviceCreateTexture", fn (device: *gpu.Device, descriptor: *const gpu.Texture.Descriptor) callconv(.Inline) *gpu.Texture);
     assertDecl(T, "deviceDestroy", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "deviceEnumerateFeatures", fn (device: *gpu.Device, features: ?[*]gpu.FeatureName) callconv(.Inline) usize);
-    assertDecl(T, "deviceGetLimits", fn (device: *gpu.Device, limits: *gpu.SupportedLimits) callconv(.Inline) bool);
+    assertDecl(T, "deviceGetLimits", fn (device: *gpu.Device, limits: *gpu.SupportedLimits) callconv(.Inline) u32);
     assertDecl(T, "deviceGetQueue", fn (device: *gpu.Device) callconv(.Inline) *gpu.Queue);
-    assertDecl(T, "deviceHasFeature", fn (device: *gpu.Device, feature: gpu.FeatureName) callconv(.Inline) bool);
+    assertDecl(T, "deviceHasFeature", fn (device: *gpu.Device, feature: gpu.FeatureName) callconv(.Inline) u32);
+    assertDecl(T, "deviceImportSharedFence", fn (device: *gpu.Device, descriptor: *const gpu.SharedFence.Descriptor) callconv(.Inline) *gpu.SharedFence);
+    assertDecl(T, "deviceImportSharedTextureMemory", fn (device: *gpu.Device, descriptor: *const gpu.SharedTextureMemory.Descriptor) callconv(.Inline) *gpu.SharedTextureMemory);
     assertDecl(T, "deviceInjectError", fn (device: *gpu.Device, typ: gpu.ErrorType, message: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "devicePopErrorScope", fn (device: *gpu.Device, callback: gpu.ErrorCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "devicePushErrorScope", fn (device: *gpu.Device, filter: gpu.ErrorFilter) callconv(.Inline) void);
@@ -196,6 +198,16 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "shaderModuleSetLabel", fn (shader_module: *gpu.ShaderModule, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "shaderModuleReference", fn (shader_module: *gpu.ShaderModule) callconv(.Inline) void);
     assertDecl(T, "shaderModuleRelease", fn (shader_module: *gpu.ShaderModule) callconv(.Inline) void);
+    assertDecl(T, "sharedFenceExportInfo", fn (shared_fence: *gpu.SharedFence, info: *gpu.SharedFence.ExportInfo) callconv(.Inline) void);
+    assertDecl(T, "sharedFenceReference", fn (shared_fence: *gpu.SharedFence) callconv(.Inline) void);
+    assertDecl(T, "sharedFenceRelease", fn (shared_fence: *gpu.SharedFence) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryBeginAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *const gpu.SharedTextureMemory.BeginAccessDescriptor) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryCreateTexture", fn (shared_texture_memory: *gpu.SharedTextureMemory, descriptor: *const gpu.Texture.Descriptor) callconv(.Inline) *gpu.Texture);
+    assertDecl(T, "sharedTextureMemoryEndAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryGetProperties", fn (shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemorySetLabel", fn (shared_texture_memory: *gpu.SharedTextureMemory, label: [*:0]const u8) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryReference", fn (shared_texture_memory: *gpu.SharedTextureMemory) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryRelease", fn (shared_texture_memory: *gpu.SharedTextureMemory) callconv(.Inline) void);
     assertDecl(T, "surfaceReference", fn (surface: *gpu.Surface) callconv(.Inline) void);
     assertDecl(T, "surfaceRelease", fn (surface: *gpu.Surface) callconv(.Inline) void);
     assertDecl(T, "swapChainGetCurrentTexture", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) ?*gpu.Texture);
@@ -252,13 +264,13 @@ pub fn Export(comptime T: type) type {
             return T.adapterEnumerateFeatures(adapter, features);
         }
 
-        // WGPU_EXPORT WGPUInstance wgpuAdapterGetInstance(WGPUAdapter adapter) WGPU_FUNCTION_ATTRIBUTE;
+        // WGPU_EXPORT WGPUInstance wgpuAdapterGetInstance(WGPUAdapter adapter);
         export fn wgpuAdapterGetInstance(adapter: *gpu.Adapter) *gpu.Instance {
             return T.adapterGetInstance(adapter);
         }
 
-        // WGPU_EXPORT bool wgpuAdapterGetLimits(WGPUAdapter adapter, WGPUSupportedLimits * limits);
-        export fn wgpuAdapterGetLimits(adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) bool {
+        // WGPU_EXPORT WGPUBool wgpuAdapterGetLimits(WGPUAdapter adapter, WGPUSupportedLimits * limits);
+        export fn wgpuAdapterGetLimits(adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) u32 {
             return T.adapterGetLimits(adapter, limits);
         }
 
@@ -267,8 +279,8 @@ pub fn Export(comptime T: type) type {
             return T.adapterGetProperties(adapter, properties);
         }
 
-        // WGPU_EXPORT bool wgpuAdapterHasFeature(WGPUAdapter adapter, WGPUFeatureName feature);
-        export fn wgpuAdapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) bool {
+        // WGPU_EXPORT WGPUBool wgpuAdapterHasFeature(WGPUAdapter adapter, WGPUFeatureName feature);
+        export fn wgpuAdapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) u32 {
             return T.adapterHasFeature(adapter, feature);
         }
 
@@ -657,9 +669,19 @@ pub fn Export(comptime T: type) type {
             return T.deviceEnumerateFeatures(device, features);
         }
 
-        // WGPU_EXPORT bool wgpuDeviceGetLimits(WGPUDevice device, WGPUSupportedLimits * limits);
-        export fn wgpuDeviceGetLimits(device: *gpu.Device, limits: *gpu.SupportedLimits) bool {
+        // WGPU_EXPORT WGPUBool wgpuDeviceGetLimits(WGPUDevice device, WGPUSupportedLimits * limits);
+        export fn wgpuDeviceGetLimits(device: *gpu.Device, limits: *gpu.SupportedLimits) u32 {
             return T.deviceGetLimits(device, limits);
+        }
+
+        // WGPU_EXPORT WGPUSharedFence wgpuDeviceImportSharedFence(WGPUDevice device, WGPUSharedFenceDescriptor const * descriptor);
+        export fn wgpuDeviceImportSharedFence(device: *gpu.Device, descriptor: *const gpu.SharedFence.Descriptor) *gpu.SharedFence {
+            return T.deviceImportSharedFence(device, descriptor);
+        }
+
+        // WGPU_EXPORT WGPUSharedTextureMemory wgpuDeviceImportSharedTextureMemory(WGPUDevice device, WGPUSharedTextureMemoryDescriptor const * descriptor);
+        export fn wgpuDeviceImportSharedTextureMemory(device: *gpu.Device, descriptor: *const gpu.SharedTextureMemory.Descriptor) *gpu.SharedTextureMemory {
+            return T.deviceImportSharedTextureMemory(device, descriptor);
         }
 
         // WGPU_EXPORT WGPUQueue wgpuDeviceGetQueue(WGPUDevice device);
@@ -668,7 +690,7 @@ pub fn Export(comptime T: type) type {
         }
 
         // WGPU_EXPORT bool wgpuDeviceHasFeature(WGPUDevice device, WGPUFeatureName feature);
-        export fn wgpuDeviceHasFeature(device: *gpu.Device, feature: gpu.FeatureName) bool {
+        export fn wgpuDeviceHasFeature(device: *gpu.Device, feature: gpu.FeatureName) u32 {
             return T.deviceHasFeature(device, feature);
         }
 
@@ -1120,6 +1142,56 @@ pub fn Export(comptime T: type) type {
             T.shaderModuleRelease(shader_module);
         }
 
+        // WGPU_EXPORT void wgpuSharedFenceExportInfo(WGPUSharedFence sharedFence, WGPUSharedFenceExportInfo * info);
+        export fn wgpuSharedFenceExportInfo(shared_fence: *gpu.SharedFence, info: *gpu.SharedFence.ExportInfo) void {
+            T.sharedFenceExportInfo(shared_fence, info);
+        }
+
+        // WGPU_EXPORT void wgpuSharedFenceReference(WGPUSharedFence sharedFence);
+        export fn wgpuSharedFenceReference(shared_fence: *gpu.SharedFence) void {
+            T.sharedFenceReference(shared_fence);
+        }
+
+        // WGPU_EXPORT void wgpuSharedFenceRelease(WGPUSharedFence sharedFence);
+        export fn wgpuSharedFenceRelease(shared_fence: *gpu.SharedFence) void {
+            T.sharedFenceRelease(shared_fence);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemoryBeginAccess(WGPUSharedTextureMemory sharedTextureMemory, WGPUTexture texture, WGPUSharedTextureMemoryBeginAccessDescriptor const * descriptor);
+        export fn wgpuSharedTextureMemoryBeginAccess(shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *const gpu.SharedTextureMemory.BeginAccessDescriptor) void {
+            T.sharedTextureMemoryBeginAccess(shared_texture_memory, texture, descriptor);
+        }
+
+        // WGPU_EXPORT WGPUTexture wgpuSharedTextureMemoryCreateTexture(WGPUSharedTextureMemory sharedTextureMemory, WGPUTextureDescriptor const * descriptor);
+        export fn wgpuSharedTextureMemoryCreateTexture(shared_texture_memory: *gpu.SharedTextureMemory, descriptor: *const gpu.Texture.Descriptor) *gpu.Texture {
+            return T.sharedTextureMemoryCreateTexture(shared_texture_memory, descriptor);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemoryEndAccess(WGPUSharedTextureMemory sharedTextureMemory, WGPUTexture texture, WGPUSharedTextureMemoryEndAccessState * descriptor);
+        export fn wgpuSharedTextureMemoryEndAccess(shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) void {
+            T.sharedTextureMemoryEndAccess(shared_texture_memory, texture, descriptor);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemoryGetProperties(WGPUSharedTextureMemory sharedTextureMemory, WGPUSharedTextureMemoryProperties * properties);
+        export fn wgpuSharedTextureMemoryGetProperties(shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) void {
+            T.sharedTextureMemoryGetProperties(shared_texture_memory, properties);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemorySetLabel(WGPUSharedTextureMemory sharedTextureMemory, char const * label);
+        export fn wgpuSharedTextureMemorySetLabel(shared_texture_memory: *gpu.SharedTextureMemory, label: [*:0]const u8) void {
+            T.sharedTextureMemorySetLabel(shared_texture_memory, label);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemoryReference(WGPUSharedTextureMemory sharedTextureMemory);
+        export fn wgpuSharedTextureMemoryReference(shared_texture_memory: *gpu.SharedTextureMemory) void {
+            T.sharedTextureMemoryReference(shared_texture_memory);
+        }
+
+        // WGPU_EXPORT void wgpuSharedTextureMemoryRelease(WGPUSharedTextureMemory sharedTextureMemory);
+        export fn wgpuSharedTextureMemoryRelease(shared_texture_memory: *gpu.SharedTextureMemory) void {
+            T.sharedTextureMemoryRelease(shared_texture_memory);
+        }
+
         // WGPU_EXPORT void wgpuSurfaceReference(WGPUSurface surface);
         export fn wgpuSurfaceReference(surface: *gpu.Surface) void {
             T.surfaceReference(surface);
@@ -1267,7 +1339,7 @@ pub const StubInterface = Interface(struct {
         unreachable;
     }
 
-    pub inline fn adapterGetLimits(adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) bool {
+    pub inline fn adapterGetLimits(adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) u32 {
         _ = adapter;
         _ = limits;
         unreachable;
@@ -1279,7 +1351,7 @@ pub const StubInterface = Interface(struct {
         unreachable;
     }
 
-    pub inline fn adapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) bool {
+    pub inline fn adapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) u32 {
         _ = adapter;
         _ = feature;
         unreachable;
@@ -1766,7 +1838,7 @@ pub const StubInterface = Interface(struct {
         unreachable;
     }
 
-    pub inline fn deviceGetLimits(device: *gpu.Device, limits: *gpu.SupportedLimits) bool {
+    pub inline fn deviceGetLimits(device: *gpu.Device, limits: *gpu.SupportedLimits) u32 {
         _ = device;
         _ = limits;
         unreachable;
@@ -1777,9 +1849,21 @@ pub const StubInterface = Interface(struct {
         unreachable;
     }
 
-    pub inline fn deviceHasFeature(device: *gpu.Device, feature: gpu.FeatureName) bool {
+    pub inline fn deviceHasFeature(device: *gpu.Device, feature: gpu.FeatureName) u32 {
         _ = device;
         _ = feature;
+        unreachable;
+    }
+
+    pub inline fn deviceImportSharedFence(device: *gpu.Device, descriptor: *const gpu.SharedFence.Descriptor) *gpu.SharedFence {
+        _ = device;
+        _ = descriptor;
+        unreachable;
+    }
+
+    pub inline fn deviceImportSharedTextureMemory(device: *gpu.Device, descriptor: *const gpu.SharedTextureMemory.Descriptor) *gpu.SharedTextureMemory {
+        _ = device;
+        _ = descriptor;
         unreachable;
     }
 
@@ -2351,6 +2435,64 @@ pub const StubInterface = Interface(struct {
 
     pub inline fn shaderModuleRelease(shader_module: *gpu.ShaderModule) void {
         _ = shader_module;
+        unreachable;
+    }
+
+    pub inline fn sharedFenceExportInfo(shared_fence: *gpu.SharedFence, info: *gpu.SharedFence.ExportInfo) void {
+        _ = shared_fence;
+        _ = info;
+        unreachable;
+    }
+
+    pub inline fn sharedFenceReference(shared_fence: *gpu.SharedFence) void {
+        _ = shared_fence;
+        unreachable;
+    }
+
+    pub inline fn sharedFenceRelease(shared_fence: *gpu.SharedFence) void {
+        _ = shared_fence;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryBeginAccess(shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *const gpu.SharedTextureMemory.BeginAccessDescriptor) void {
+        _ = shared_texture_memory;
+        _ = texture;
+        _ = descriptor;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryCreateTexture(shared_texture_memory: *gpu.SharedTextureMemory, descriptor: *const gpu.Texture.Descriptor) *gpu.Texture {
+        _ = shared_texture_memory;
+        _ = descriptor;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryEndAccess(shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) void {
+        _ = shared_texture_memory;
+        _ = texture;
+        _ = descriptor;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryGetProperties(shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) void {
+        _ = shared_texture_memory;
+        _ = properties;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemorySetLabel(shared_texture_memory: *gpu.SharedTextureMemory, label: [*:0]const u8) void {
+        _ = shared_texture_memory;
+        _ = label;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryReference(shared_texture_memory: *gpu.SharedTextureMemory) void {
+        _ = shared_texture_memory;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryRelease(shared_texture_memory: *gpu.SharedTextureMemory) void {
+        _ = shared_texture_memory;
         unreachable;
     }
 

@@ -32,7 +32,7 @@ pub const Instance = opaque {
         comptime callback: fn (
             ctx: @TypeOf(context),
             status: RequestAdapterStatus,
-            adapter: *Adapter,
+            adapter: ?*Adapter,
             message: ?[*:0]const u8,
         ) callconv(.Inline) void,
     ) void {
@@ -40,7 +40,7 @@ pub const Instance = opaque {
         const Helper = struct {
             pub fn cCallback(
                 status: RequestAdapterStatus,
-                adapter: *Adapter,
+                adapter: ?*Adapter,
                 message: ?[*:0]const u8,
                 userdata: ?*anyopaque,
             ) callconv(.C) void {
