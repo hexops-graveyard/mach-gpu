@@ -35,7 +35,6 @@ pub fn build(b: *std.Build) !void {
     //     .target = target,
     //     .optimize = optimize,
     // });
-    // example.linkLibrary(glfw_dep.artifact("mach-glfw"));
     // example.addModule("glfw", glfw_dep.module("mach-glfw"));
     // try @import("mach_glfw").link(b, example);
 
