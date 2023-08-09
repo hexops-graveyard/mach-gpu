@@ -3,8 +3,8 @@
     .version = "0.2.0",
     .dependencies = .{
         .mach_gpu_dawn = .{
-            .url = "https://pkg.machengine.org/mach-gpu-dawn/7a3a0e251bd7fe9ba9761ac1147bf0ad71e80c89.tar.gz",
-            .hash = "12207c28fbbe17cb070a48b72129f8439219fb955cd8c686d0e886d48ae7ca58a46c",
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/97458c5f509ef4608e43a21a31d4135b8438bf9f.tar.gz",
+            .hash = "122063ca2dc2e45b662134ff4228f81daa349f1480da327e48d6b0f83afca8859173",
         },
         .mach_glfw = .{
             .url = "https://pkg.machengine.org/mach-glfw/e52168e273a16311f7031e9df5afeb1a8c41466a.tar.gz",
