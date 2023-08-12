@@ -25,6 +25,7 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "adapterGetLimits", fn (adapter: *gpu.Adapter, limits: *gpu.SupportedLimits) callconv(.Inline) u32);
     assertDecl(T, "adapterGetProperties", fn (adapter: *gpu.Adapter, properties: *gpu.Adapter.Properties) callconv(.Inline) void);
     assertDecl(T, "adapterHasFeature", fn (adapter: *gpu.Adapter, feature: gpu.FeatureName) callconv(.Inline) u32);
+    assertDecl(T, "adapterPropertiesFreeMembers", fn (value: gpu.Adapter.Properties) callconv(.Inline) void);
     assertDecl(T, "adapterRequestDevice", fn (adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor, callback: gpu.RequestDeviceCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "adapterReference", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
     assertDecl(T, "adapterRelease", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
@@ -204,6 +205,7 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "sharedTextureMemoryBeginAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *const gpu.SharedTextureMemory.BeginAccessDescriptor) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryCreateTexture", fn (shared_texture_memory: *gpu.SharedTextureMemory, descriptor: *const gpu.Texture.Descriptor) callconv(.Inline) *gpu.Texture);
     assertDecl(T, "sharedTextureMemoryEndAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) callconv(.Inline) void);
+    assertDecl(T, "sharedTextureMemoryEndAccessStateFreeMembers", fn (value: gpu.SharedTextureMemory.EndAccessState) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryGetProperties", fn (shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemorySetLabel", fn (shared_texture_memory: *gpu.SharedTextureMemory, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryReference", fn (shared_texture_memory: *gpu.SharedTextureMemory) callconv(.Inline) void);
@@ -282,6 +284,11 @@ pub fn Export(comptime T: type) type {
         // WGPU_EXPORT WGPUBool wgpuAdapterHasFeature(WGPUAdapter adapter, WGPUFeatureName feature);
         export fn wgpuAdapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) u32 {
             return T.adapterHasFeature(adapter, feature);
+        }
+
+        // WGPU_EXPORT void wgpuAdapterPropertiesFreeMembers(WGPUAdapterProperties value);
+        export fn wgpuAdapterPropertiesFreeMembers(value: gpu.Adapter.Properties) void {
+            T.adapterPropertiesFreeMembers(value);
         }
 
         // WGPU_EXPORT void wgpuAdapterRequestDevice(WGPUAdapter adapter, WGPUDeviceDescriptor const * descriptor /* nullable */, WGPURequestDeviceCallback callback, void * userdata);
@@ -1172,6 +1179,11 @@ pub fn Export(comptime T: type) type {
             T.sharedTextureMemoryEndAccess(shared_texture_memory, texture, descriptor);
         }
 
+        // WGPU_EXPORT void wgpuSharedTextureMemoryEndAccessStateFreeMembers(WGPUSharedTextureMemoryEndAccessState value);
+        export fn wgpuSharedTextureMemoryEndAccessStateFreeMembers(value: gpu.SharedTextureMemory.EndAccessState) void {
+            T.sharedTextureMemoryEndAccessStateFreeMembers(value);
+        }
+
         // WGPU_EXPORT void wgpuSharedTextureMemoryGetProperties(WGPUSharedTextureMemory sharedTextureMemory, WGPUSharedTextureMemoryProperties * properties);
         export fn wgpuSharedTextureMemoryGetProperties(shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) void {
             T.sharedTextureMemoryGetProperties(shared_texture_memory, properties);
@@ -1354,6 +1366,11 @@ pub const StubInterface = Interface(struct {
     pub inline fn adapterHasFeature(adapter: *gpu.Adapter, feature: gpu.FeatureName) u32 {
         _ = adapter;
         _ = feature;
+        unreachable;
+    }
+
+    pub inline fn adapterPropertiesFreeMembers(value: gpu.Adapter.Properties) void {
+        _ = value;
         unreachable;
     }
 
@@ -2471,6 +2488,11 @@ pub const StubInterface = Interface(struct {
         _ = shared_texture_memory;
         _ = texture;
         _ = descriptor;
+        unreachable;
+    }
+
+    pub inline fn sharedTextureMemoryEndAccessStateFreeMembers(value: gpu.SharedTextureMemory.EndAccessState) void {
+        _ = value;
         unreachable;
     }
 

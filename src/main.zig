@@ -294,7 +294,6 @@ pub const FeatureName = enum(u32) {
     rg11_b10_ufloat_renderable = 0x0000000A,
     bgra8_unorm_storage = 0x0000000B,
     float32_filterable = 0x0000000C,
-    dawn_shader_float16 = 0x000003e9,
     dawn_internal_usages = 0x000003ea,
     dawn_multi_planar_formats = 0x000003eb,
     dawn_native = 0x000003ec,
