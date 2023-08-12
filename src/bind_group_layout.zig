@@ -1,3 +1,4 @@
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStruct = @import("main.zig").ChainedStruct;
 const ShaderStageFlags = @import("main.zig").ShaderStageFlags;
 const Buffer = @import("buffer.zig").Buffer;
@@ -37,7 +38,7 @@ pub const BindGroupLayout = opaque {
                 .visibility = visibility,
                 .buffer = .{
                     .type = binding_type,
-                    .has_dynamic_offset = has_dynamic_offset,
+                    .has_dynamic_offset = Bool32.from(has_dynamic_offset),
                     .min_binding_size = min_binding_size,
                 },
             };

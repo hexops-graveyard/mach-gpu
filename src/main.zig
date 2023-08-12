@@ -58,6 +58,16 @@ pub const whole_size = 0xffffffffffffffff;
 /// cast to the right `fn (...) callconv(.C) T` type before use.
 pub const Proc = *const fn () callconv(.C) void;
 
+/// 32-bit unsigned boolean type, as used in webgpu.h
+pub const Bool32 = enum(u32) {
+    false,
+    true,
+
+    pub inline fn from(v: bool) @This() {
+        return if (v) .true else .false;
+    }
+};
+
 pub const ComputePassTimestampWrite = extern struct {
     query_set: *QuerySet,
     query_index: u32,
@@ -69,11 +79,11 @@ pub const RenderPassDepthStencilAttachment = extern struct {
     depth_load_op: LoadOp = .undefined,
     depth_store_op: StoreOp = .undefined,
     depth_clear_value: f32 = 0,
-    depth_read_only: bool align(32) = false,
+    depth_read_only: Bool32 = .false,
     stencil_load_op: LoadOp = .undefined,
     stencil_store_op: StoreOp = .undefined,
     stencil_clear_value: u32 = 0,
-    stencil_read_only: bool align(32) = false,
+    stencil_read_only: Bool32 = .false,
 };
 
 pub const RenderPassTimestampWrite = extern struct {
@@ -92,8 +102,8 @@ pub const RequestAdapterOptions = extern struct {
     compatible_surface: ?*Surface = null,
     power_preference: PowerPreference = .undefined,
     backend_type: BackendType = .undefined,
-    force_fallback_adapter: bool align(32) = false,
-    compatibility_mode: bool align(32) = false,
+    force_fallback_adapter: Bool32 = .false,
+    compatibility_mode: Bool32 = .false,
 };
 
 pub const ComputePassDescriptor = extern struct {
@@ -696,14 +706,14 @@ pub const ConstantEntry = extern struct {
 
 pub const CopyTextureForBrowserOptions = extern struct {
     next_in_chain: ?*const ChainedStruct = null,
-    flip_y: bool align(32) = false,
-    needs_color_space_conversion: bool align(32) = false,
+    flip_y: Bool32 = .false,
+    needs_color_space_conversion: Bool32 = .false,
     src_alpha_mode: AlphaMode = .unpremultiplied,
     src_transfer_function_parameters: ?*const [7]f32 = null,
     conversion_matrix: ?*const [9]f32 = null,
     dst_transfer_function_parameters: ?*const [7]f32 = null,
     dst_alpha_mode: AlphaMode = .unpremultiplied,
-    internal_usage: bool align(32) = false,
+    internal_usage: Bool32 = .false,
 };
 
 pub const MultisampleState = extern struct {
@@ -715,12 +725,12 @@ pub const MultisampleState = extern struct {
     next_in_chain: NextInChain = .{ .generic = null },
     count: u32 = 1,
     mask: u32 = 0xFFFFFFFF,
-    alpha_to_coverage_enabled: bool align(32) = false,
+    alpha_to_coverage_enabled: Bool32 = .false,
 };
 
 pub const PrimitiveDepthClipControl = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .primitive_depth_clip_control },
-    unclipped_depth: bool align(32) = false,
+    unclipped_depth: Bool32 = .false,
 };
 
 pub const PrimitiveState = extern struct {

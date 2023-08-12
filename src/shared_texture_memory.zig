@@ -1,4 +1,5 @@
 const Texture = @import("texture.zig").Texture;
+const Bool32 = @import("main.zig").Bool32;
 const Extent3D = @import("main.zig").Extent3D;
 const SharedFence = @import("shared_fence.zig").SharedFence;
 const ChainedStruct = @import("main.zig").ChainedStruct;
@@ -31,7 +32,7 @@ pub const SharedTextureMemory = opaque {
         };
 
         next_in_chain: NextInChain = .{ .generic = null },
-        initialized: bool align(32),
+        initialized: Bool32,
         fence_count: usize,
         fences: *const SharedFence,
         signaled_values: *const u64,
@@ -81,7 +82,7 @@ pub const SharedTextureMemory = opaque {
         };
 
         next_in_chain: NextInChain = .{ .generic = null },
-        initialized: bool align(32),
+        initialized: Bool32,
         fence_count: usize,
         fences: *const SharedFence,
         signaled_values: *const u64,
@@ -100,7 +101,7 @@ pub const SharedTextureMemory = opaque {
 
     pub const VkDedicatedAllocationDescriptor = extern struct {
         chain: ChainedStruct = .{ .next = null, .s_type = .shared_texture_memory_vk_dedicated_allocation_descriptor },
-        dedicated_allocation: bool align(32),
+        dedicated_allocation: Bool32,
     };
 
     pub const VkImageLayoutBeginState = extern struct {

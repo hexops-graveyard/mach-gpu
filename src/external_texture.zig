@@ -1,3 +1,4 @@
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStruct = @import("main.zig").ChainedStruct;
 const TextureView = @import("texture_view.zig").TextureView;
 const Origin2D = @import("main.zig").Origin2D;
@@ -33,7 +34,7 @@ pub const ExternalTexture = opaque {
         src_transform_function_parameters: *const [7]f32,
         dst_transform_function_parameters: *const [7]f32,
         gamut_conversion_matrix: *const [9]f32,
-        flip_y: bool align(32),
+        flip_y: Bool32,
         rotation: Rotation,
     };
 

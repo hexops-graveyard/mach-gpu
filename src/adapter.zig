@@ -1,6 +1,7 @@
 const std = @import("std");
 const testing = std.testing;
 const dawn = @import("dawn.zig");
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStructOut = @import("main.zig").ChainedStructOut;
 const Device = @import("device.zig").Device;
 const Instance = @import("instance.zig").Instance;
@@ -43,7 +44,7 @@ pub const Adapter = opaque {
         driver_description: [*:0]const u8,
         adapter_type: Type,
         backend_type: BackendType,
-        compatibility_mode: bool align(32) = false,
+        compatibility_mode: Bool32 = .false,
     };
 
     pub inline fn createDevice(adapter: *Adapter, descriptor: ?*const Device.Descriptor) ?*Device {

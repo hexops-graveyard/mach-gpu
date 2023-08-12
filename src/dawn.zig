@@ -1,3 +1,4 @@
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStruct = @import("main.zig").ChainedStruct;
 const ChainedStructOut = @import("main.zig").ChainedStructOut;
 const PowerPreference = @import("main.zig").PowerPreference;
@@ -11,7 +12,7 @@ pub const CacheDeviceDescriptor = extern struct {
 
 pub const EncoderInternalUsageDescriptor = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .dawn_encoder_internal_usage_descriptor },
-    use_internal_usages: bool align(32) = false,
+    use_internal_usages: Bool32 = .false,
 };
 
 pub const MultisampleStateRenderToSingleSampled = extern struct {
