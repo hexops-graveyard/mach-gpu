@@ -51,6 +51,10 @@ pub const Interface = struct {
         return procs.adapterHasFeature.?(@ptrCast(adapter), @intFromEnum(feature));
     }
 
+    pub inline fn adapterPropertiesFreeMembers(value: gpu.Adapter.Properties) void {
+        procs.adapterPropertiesFreeMembers.?(@bitCast(value));
+    }
+
     pub inline fn adapterRequestDevice(adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor, callback: gpu.RequestDeviceCallback, userdata: ?*anyopaque) void {
         return procs.adapterRequestDevice.?(
             @ptrCast(adapter),
@@ -1141,6 +1145,10 @@ pub const Interface = struct {
 
     pub inline fn sharedTextureMemoryEndAccess(shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) void {
         procs.sharedTextureMemoryEndAccess.?(@ptrCast(shared_texture_memory), @ptrCast(texture), @ptrCast(descriptor));
+    }
+
+    pub inline fn sharedTextureMemoryEndAccessStateFreeMembers(value: gpu.SharedTextureMemory.EndAccessState) void {
+        procs.sharedTextureMemoryEndAccessStateFreeMembers.?(@bitCast(value));
     }
 
     pub inline fn sharedTextureMemoryGetProperties(shared_texture_memory: *gpu.SharedTextureMemory, properties: *gpu.SharedTextureMemory.Properties) void {
