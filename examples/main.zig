@@ -131,6 +131,7 @@ const FrameParams = struct {
 
 fn frame(params: FrameParams) !void {
     glfw.pollEvents();
+    params.device.tick();
     const pl = params.window.getUserPointer(WindowData).?;
     if (pl.swap_chain == null or !std.meta.eql(pl.current_desc, pl.target_desc)) {
         pl.swap_chain = params.device.createSwapChain(pl.surface, &pl.target_desc);
@@ -209,7 +210,7 @@ pub fn setupWindow(allocator: std.mem.Allocator) !Setup {
     instance.?.requestAdapter(&gpu.RequestAdapterOptions{
         .compatible_surface = surface,
         .power_preference = .undefined,
-        .force_fallback_adapter = false,
+        .force_fallback_adapter = .false,
     }, &response, util.requestAdapterCallback);
     if (response.status != .success) {
         std.debug.print("failed to create GPU adapter: {s}\n", .{response.message.?});
