@@ -13,12 +13,15 @@ pub fn build(b: *std.Build) !void {
         .source_file = .{ .path = "src/main.zig" },
     });
 
-    const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
-
     // TODO: uncomment all this code once hexops/mach#902 is fixed, b.dependency("mach_glfw") cannot
     // be called inside `pub fn build` if we want this package to be usable via the package manager.
+    _ = optimize;
+    _ = target;
+    _ = gpu_dawn_options;
     _ = module;
+
+    // const test_step = b.step("test", "Run library tests");
+    // test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
 
     // const example = b.addExecutable(.{
     //     .name = "gpu-hello-triangle",
