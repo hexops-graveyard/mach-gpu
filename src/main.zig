@@ -792,7 +792,7 @@ pub const CompilationInfo = extern struct {
 pub const DepthStencilState = extern struct {
     next_in_chain: ?*const ChainedStruct = null,
     format: Texture.Format,
-    depth_write_enabled: bool = false,
+    depth_write_enabled: Bool32 = .false,
     depth_compare: CompareFunction = .always,
     stencil_front: StencilFaceState = .{},
     stencil_back: StencilFaceState = .{},

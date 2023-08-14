@@ -1,4 +1,5 @@
 const std = @import("std");
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStruct = @import("main.zig").ChainedStruct;
 const TextureView = @import("texture_view.zig").TextureView;
 const Extent3D = @import("main.zig").Extent3D;
@@ -157,7 +158,7 @@ pub const Texture = opaque {
         next_in_chain: ?*const ChainedStruct = null,
         sample_type: SampleType = .undefined,
         view_dimension: TextureView.Dimension = .dimension_undefined,
-        multisampled: bool = false,
+        multisampled: Bool32 = .false,
     };
 
     pub const DataLayout = extern struct {

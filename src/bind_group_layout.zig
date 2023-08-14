@@ -71,7 +71,7 @@ pub const BindGroupLayout = opaque {
                 .texture = .{
                     .sample_type = sample_type,
                     .view_dimension = view_dimension,
-                    .multisampled = multisampled,
+                    .multisampled = Bool32.from(multisampled),
                 },
             };
         }

@@ -17,7 +17,7 @@ pub const EncoderInternalUsageDescriptor = extern struct {
 
 pub const MultisampleStateRenderToSingleSampled = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .dawn_multisample_state_render_to_single_sampled },
-    enabled: bool = false,
+    enabled: Bool32 = .false,
 };
 
 pub const RenderPassColorAttachmentRenderToSingleSampled = extern struct {
@@ -55,7 +55,7 @@ pub const TogglesDescriptor = extern struct {
 
 pub const ShaderModuleSPIRVOptionsDescriptor = extern struct {
     chain: ChainedStruct = .{ .next = null, .s_type = .dawn_shader_module_spirv_options_descriptor },
-    allow_non_uniform_derivatives: bool = false,
+    allow_non_uniform_derivatives: Bool32 = .false,
 };
 
 pub const AdapterPropertiesPowerPreference = extern struct {
@@ -71,5 +71,5 @@ pub const BufferDescriptorErrorInfoFromWireClient = extern struct {
         .next = null,
         .s_type = .dawn_buffer_descriptor_error_info_from_wire_client,
     },
-    out_of_memory: bool = false,
+    out_of_memory: Bool32 = .false,
 };

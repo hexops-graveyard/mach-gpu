@@ -29,7 +29,7 @@ pub const ExternalTexture = opaque {
         plane1: ?*TextureView = null,
         visible_origin: Origin2D,
         visible_size: Extent2D,
-        do_yuv_to_rgb_conversion_only: bool = false,
+        do_yuv_to_rgb_conversion_only: Bool32 = .false,
         yuv_to_rgb_conversion_matrix: ?*const [12]f32 = null,
         src_transform_function_parameters: *const [7]f32,
         dst_transform_function_parameters: *const [7]f32,

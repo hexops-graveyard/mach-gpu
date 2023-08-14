@@ -3,6 +3,7 @@ const Buffer = @import("buffer.zig").Buffer;
 const BindGroup = @import("bind_group.zig").BindGroup;
 const RenderPipeline = @import("render_pipeline.zig").RenderPipeline;
 const RenderBundle = @import("render_bundle.zig").RenderBundle;
+const Bool32 = @import("main.zig").Bool32;
 const ChainedStruct = @import("main.zig").ChainedStruct;
 const IndexFormat = @import("main.zig").IndexFormat;
 const Impl = @import("interface.zig").Impl;
@@ -15,8 +16,8 @@ pub const RenderBundleEncoder = opaque {
         color_formats: ?[*]const Texture.Format = null,
         depth_stencil_format: Texture.Format = .undefined,
         sample_count: u32 = 1,
-        depth_read_only: bool = false,
-        stencil_read_only: bool = false,
+        depth_read_only: Bool32 = .false,
+        stencil_read_only: Bool32 = .false,
 
         /// Provides a slightly friendlier Zig API to initialize this structure.
         pub inline fn init(v: struct {
@@ -35,8 +36,8 @@ pub const RenderBundleEncoder = opaque {
                 .color_formats = if (v.color_formats) |e| e.ptr else null,
                 .depth_stencil_format = v.depth_stencil_format,
                 .sample_count = v.sample_count,
-                .depth_read_only = v.depth_read_only,
-                .stencil_read_only = v.stencil_read_only,
+                .depth_read_only = Bool32.from(v.depth_read_only),
+                .stencil_read_only = Bool32.from(v.stencil_read_only),
             };
         }
     };
