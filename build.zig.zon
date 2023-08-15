@@ -3,8 +3,8 @@
     .version = "0.2.0",
     .dependencies = .{
         .mach_gpu_dawn = .{
-            .url = "https://pkg.machengine.org/mach-gpu-dawn/5d463ceb63246b3b73070c774465c67dd657e045.tar.gz",
-            .hash = "12205cd22eb1e26ea16e973fe57fb297535246d64454e3ccae8a39783c97ea488a83",
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/359bd180e48a511b4b362a8e2dbdf93fba21a5d9.tar.gz",
+            .hash = "1220eb66866f6d3a1183de6108e82a79344e6efb6d88db6e8a3e852b73d9427ba4da",
         },
         .xcode_frameworks = .{
             .url = "https://github.com/hexops/xcode-frameworks-pkg/archive/d486474a6af7fafd89e8314e0bf7eca4709f811b.tar.gz",
