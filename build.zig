@@ -13,40 +13,33 @@ pub fn build(b: *std.Build) !void {
         .source_file = .{ .path = "src/main.zig" },
     });
 
-    // TODO: uncomment all this code once hexops/mach#902 is fixed, b.dependency("mach_glfw") cannot
-    // be called inside `pub fn build` if we want this package to be usable via the package manager.
-    _ = optimize;
-    _ = target;
-    _ = gpu_dawn_options;
-    _ = module;
+    const test_step = b.step("test", "Run library tests");
+    test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
 
-    // const test_step = b.step("test", "Run library tests");
-    // test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
+    const example = b.addExecutable(.{
+        .name = "gpu-hello-triangle",
+        .root_source_file = .{ .path = "examples/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    example.addModule("gpu", module);
 
-    // const example = b.addExecutable(.{
-    //     .name = "gpu-hello-triangle",
-    //     .root_source_file = .{ .path = "examples/main.zig" },
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-    // example.addModule("gpu", module);
+    try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
 
-    // try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
+    // Link GLFW
+    const glfw_dep = b.dependency("mach_glfw", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    example.addModule("glfw", glfw_dep.module("mach-glfw"));
+    @import("mach_glfw").link(b, example);
 
-    // // Link GLFW
-    // const glfw_dep = b.dependency("mach_glfw", .{
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-    // example.addModule("glfw", glfw_dep.module("mach-glfw"));
-    // try @import("mach_glfw").link(b, example);
+    b.installArtifact(example);
 
-    // b.installArtifact(example);
-
-    // const example_run_cmd = b.addRunArtifact(example);
-    // example_run_cmd.step.dependOn(b.getInstallStep());
-    // const example_run_step = b.step("run-example", "Run the example");
-    // example_run_step.dependOn(&example_run_cmd.step);
+    const example_run_cmd = b.addRunArtifact(example);
+    example_run_cmd.step.dependOn(b.getInstallStep());
+    const example_run_step = b.step("run-example", "Run the example");
+    example_run_step.dependOn(&example_run_cmd.step);
 }
 
 pub fn testStep(b: *std.Build, optimize: std.builtin.OptimizeMode, target: std.zig.CrossTarget, options: Options) !*std.build.RunStep {
