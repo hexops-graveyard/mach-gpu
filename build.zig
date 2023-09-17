@@ -32,7 +32,13 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     example.addModule("glfw", glfw_dep.module("mach-glfw"));
-    @import("mach_glfw").link(b, example);
+    @import("mach_glfw").link(
+        b.dependency("mach_glfw", .{
+            .target = target,
+            .optimize = optimize,
+        }).builder,
+        example,
+    );
 
     b.installArtifact(example);
 
@@ -60,7 +66,14 @@ pub const Options = struct {
 
 pub fn link(b: *std.Build, step: *std.build.CompileStep, options: Options) !void {
     if (step.target.toTarget().cpu.arch != .wasm32) {
-        try gpu_dawn.link(b, step, options.gpu_dawn_options);
+        gpu_dawn.link(
+            b.dependency("mach_gpu_dawn", .{
+                .target = step.target,
+                .optimize = step.optimize,
+            }).builder,
+            step,
+            options.gpu_dawn_options,
+        );
         step.addCSourceFile(.{ .file = .{ .path = sdkPath("/src/mach_dawn.cpp") }, .flags = &.{"-std=c++17"} });
         step.addIncludePath(.{ .path = sdkPath("/src") });
     }
