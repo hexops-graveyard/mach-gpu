@@ -9,7 +9,7 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     var allocator = gpa.allocator();
 
-    gpu.Impl.init();
+    try gpu.Impl.init(allocator, .{});
     const setup = try setupWindow(allocator);
     const framebuffer_size = setup.window.getFramebufferSize();
 

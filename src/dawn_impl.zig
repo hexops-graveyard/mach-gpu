@@ -14,7 +14,7 @@ var procs: c.DawnProcTable = undefined;
 ///
 /// Before use, it must be `.init()`ialized in order to set the global proc table.
 pub const Interface = struct {
-    pub fn init(allocator: std.mem.Allocator, _: struct {}) void {
+    pub fn init(allocator: std.mem.Allocator, _: struct {}) error{}!void {
         _ = allocator;
         didInit = true;
         procs = c.machDawnGetProcTable();
