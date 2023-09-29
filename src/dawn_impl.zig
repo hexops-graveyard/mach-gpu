@@ -1,5 +1,6 @@
 const gpu = @import("main.zig");
 const builtin = @import("builtin");
+const std = @import("std");
 
 const c = @cImport({
     @cInclude("dawn/webgpu.h");
@@ -13,7 +14,8 @@ var procs: c.DawnProcTable = undefined;
 ///
 /// Before use, it must be `.init()`ialized in order to set the global proc table.
 pub const Interface = struct {
-    pub fn init() void {
+    pub fn init(allocator: std.mem.Allocator, _: struct {}) void {
+        _ = allocator;
         didInit = true;
         procs = c.machDawnGetProcTable();
     }
