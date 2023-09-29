@@ -17,8 +17,44 @@ pub const Impl = blk: {
 
 /// Verifies that a gpu.Interface implementation exposes the expected function declarations.
 pub fn Interface(comptime T: type) type {
+    // gpu.Device
+    assertDecl(T, "deviceCreateRenderPipeline", fn (device: *gpu.Device, descriptor: *const gpu.RenderPipeline.Descriptor) callconv(.Inline) *gpu.RenderPipeline);
+    assertDecl(T, "deviceCreateRenderPipelineAsync", fn (device: *gpu.Device, descriptor: *const gpu.RenderPipeline.Descriptor, callback: gpu.CreateRenderPipelineAsyncCallback, userdata: ?*anyopaque) callconv(.Inline) void);
+    assertDecl(T, "deviceCreatePipelineLayout", fn (device: *gpu.Device, pipeline_layout_descriptor: *const gpu.PipelineLayout.Descriptor) callconv(.Inline) *gpu.PipelineLayout);
+
+    // gpu.PipelineLayout
+    assertDecl(T, "pipelineLayoutSetLabel", fn (pipeline_layout: *gpu.PipelineLayout, label: [*:0]const u8) callconv(.Inline) void);
+    assertDecl(T, "pipelineLayoutReference", fn (pipeline_layout: *gpu.PipelineLayout) callconv(.Inline) void);
+    assertDecl(T, "pipelineLayoutRelease", fn (pipeline_layout: *gpu.PipelineLayout) callconv(.Inline) void);
+
+    // gpu.RenderBundleEncoder
+    assertDecl(T, "renderBundleEncoderSetPipeline", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
+    assertDecl(T, "renderBundleEncoderSetBindGroup", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, group_index: u32, group: *gpu.BindGroup, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.Inline) void);
+
+    // gpu.RenderPassEncoder
+    assertDecl(T, "renderPassEncoderSetPipeline", fn (render_pass_encoder: *gpu.RenderPassEncoder, pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
+    assertDecl(T, "renderPassEncoderSetBindGroup", fn (render_pass_encoder: *gpu.RenderPassEncoder, group_index: u32, group: *gpu.BindGroup, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.Inline) void);
+
+    // gpu.BindGroup
+    assertDecl(T, "bindGroupSetLabel", fn (bind_group: *gpu.BindGroup, label: [*:0]const u8) callconv(.Inline) void);
+    assertDecl(T, "bindGroupReference", fn (bind_group: *gpu.BindGroup) callconv(.Inline) void);
+    assertDecl(T, "bindGroupRelease", fn (bind_group: *gpu.BindGroup) callconv(.Inline) void);
+
+    // gpu.BindGroupLayout
+    assertDecl(T, "bindGroupLayoutSetLabel", fn (bind_group_layout: *gpu.BindGroupLayout, label: [*:0]const u8) callconv(.Inline) void);
+    assertDecl(T, "bindGroupLayoutReference", fn (bind_group_layout: *gpu.BindGroupLayout) callconv(.Inline) void);
+    assertDecl(T, "bindGroupLayoutRelease", fn (bind_group_layout: *gpu.BindGroupLayout) callconv(.Inline) void);
+
+    // gpu.RenderPipeline
+    assertDecl(T, "renderPipelineGetBindGroupLayout", fn (render_pipeline: *gpu.RenderPipeline, group_index: u32) callconv(.Inline) *gpu.BindGroupLayout);
+    assertDecl(T, "renderPipelineSetLabel", fn (render_pipeline: *gpu.RenderPipeline, label: [*:0]const u8) callconv(.Inline) void);
+    assertDecl(T, "renderPipelineReference", fn (render_pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
+    assertDecl(T, "renderPipelineRelease", fn (render_pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
+
+    // gpu.Instance
     assertDecl(T, "createInstance", fn (descriptor: ?*const gpu.Instance.Descriptor) callconv(.Inline) ?*gpu.Instance);
-    assertDecl(T, "getProcAddress", fn (device: *gpu.Device, proc_name: [*:0]const u8) callconv(.Inline) ?gpu.Proc);
+
+    // gpu.Adapter
     assertDecl(T, "adapterCreateDevice", fn (adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor) callconv(.Inline) ?*gpu.Device);
     assertDecl(T, "adapterEnumerateFeatures", fn (adapter: *gpu.Adapter, features: ?[*]gpu.FeatureName) callconv(.Inline) usize);
     assertDecl(T, "adapterGetInstance", fn (adapter: *gpu.Adapter) callconv(.Inline) *gpu.Instance);
@@ -29,12 +65,8 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "adapterRequestDevice", fn (adapter: *gpu.Adapter, descriptor: ?*const gpu.Device.Descriptor, callback: gpu.RequestDeviceCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "adapterReference", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
     assertDecl(T, "adapterRelease", fn (adapter: *gpu.Adapter) callconv(.Inline) void);
-    assertDecl(T, "bindGroupSetLabel", fn (bind_group: *gpu.BindGroup, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "bindGroupReference", fn (bind_group: *gpu.BindGroup) callconv(.Inline) void);
-    assertDecl(T, "bindGroupRelease", fn (bind_group: *gpu.BindGroup) callconv(.Inline) void);
-    assertDecl(T, "bindGroupLayoutSetLabel", fn (bind_group_layout: *gpu.BindGroupLayout, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "bindGroupLayoutReference", fn (bind_group_layout: *gpu.BindGroupLayout) callconv(.Inline) void);
-    assertDecl(T, "bindGroupLayoutRelease", fn (bind_group_layout: *gpu.BindGroupLayout) callconv(.Inline) void);
+
+    // gpu.Buffer
     assertDecl(T, "bufferDestroy", fn (buffer: *gpu.Buffer) callconv(.Inline) void);
     assertDecl(T, "bufferGetConstMappedRange", fn (buffer: *gpu.Buffer, offset: usize, size: usize) callconv(.Inline) ?*const anyopaque);
     assertDecl(T, "bufferGetMappedRange", fn (buffer: *gpu.Buffer, offset: usize, size: usize) callconv(.Inline) ?*anyopaque);
@@ -45,9 +77,13 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "bufferUnmap", fn (buffer: *gpu.Buffer) callconv(.Inline) void);
     assertDecl(T, "bufferReference", fn (buffer: *gpu.Buffer) callconv(.Inline) void);
     assertDecl(T, "bufferRelease", fn (buffer: *gpu.Buffer) callconv(.Inline) void);
+
+    // gpu.CommandBuffer
     assertDecl(T, "commandBufferSetLabel", fn (command_buffer: *gpu.CommandBuffer, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "commandBufferReference", fn (command_buffer: *gpu.CommandBuffer) callconv(.Inline) void);
     assertDecl(T, "commandBufferRelease", fn (command_buffer: *gpu.CommandBuffer) callconv(.Inline) void);
+
+    // gpu.CommandEncoder
     assertDecl(T, "commandEncoderBeginComputePass", fn (command_encoder: *gpu.CommandEncoder, descriptor: ?*const gpu.ComputePassDescriptor) callconv(.Inline) *gpu.ComputePassEncoder);
     assertDecl(T, "commandEncoderBeginRenderPass", fn (command_encoder: *gpu.CommandEncoder, descriptor: *const gpu.RenderPassDescriptor) callconv(.Inline) *gpu.RenderPassEncoder);
     assertDecl(T, "commandEncoderClearBuffer", fn (command_encoder: *gpu.CommandEncoder, buffer: *gpu.Buffer, offset: u64, size: u64) callconv(.Inline) void);
@@ -66,6 +102,8 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "commandEncoderWriteTimestamp", fn (command_encoder: *gpu.CommandEncoder, query_set: *gpu.QuerySet, query_index: u32) callconv(.Inline) void);
     assertDecl(T, "commandEncoderReference", fn (command_encoder: *gpu.CommandEncoder) callconv(.Inline) void);
     assertDecl(T, "commandEncoderRelease", fn (command_encoder: *gpu.CommandEncoder) callconv(.Inline) void);
+
+    // gpu.ComputePassEncoder
     assertDecl(T, "computePassEncoderDispatchWorkgroups", fn (compute_pass_encoder: *gpu.ComputePassEncoder, workgroup_count_x: u32, workgroup_count_y: u32, workgroup_count_z: u32) callconv(.Inline) void);
     assertDecl(T, "computePassEncoderDispatchWorkgroupsIndirect", fn (compute_pass_encoder: *gpu.ComputePassEncoder, indirect_buffer: *gpu.Buffer, indirect_offset: u64) callconv(.Inline) void);
     assertDecl(T, "computePassEncoderEnd", fn (compute_pass_encoder: *gpu.ComputePassEncoder) callconv(.Inline) void);
@@ -78,10 +116,15 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "computePassEncoderWriteTimestamp", fn (compute_pass_encoder: *gpu.ComputePassEncoder, query_set: *gpu.QuerySet, query_index: u32) callconv(.Inline) void);
     assertDecl(T, "computePassEncoderReference", fn (compute_pass_encoder: *gpu.ComputePassEncoder) callconv(.Inline) void);
     assertDecl(T, "computePassEncoderRelease", fn (compute_pass_encoder: *gpu.ComputePassEncoder) callconv(.Inline) void);
+
+    // gpu.ComputePipeline
     assertDecl(T, "computePipelineGetBindGroupLayout", fn (compute_pipeline: *gpu.ComputePipeline, group_index: u32) callconv(.Inline) *gpu.BindGroupLayout);
     assertDecl(T, "computePipelineSetLabel", fn (compute_pipeline: *gpu.ComputePipeline, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "computePipelineReference", fn (compute_pipeline: *gpu.ComputePipeline) callconv(.Inline) void);
     assertDecl(T, "computePipelineRelease", fn (compute_pipeline: *gpu.ComputePipeline) callconv(.Inline) void);
+
+    // gpu.Device
+    assertDecl(T, "getProcAddress", fn (device: *gpu.Device, proc_name: [*:0]const u8) callconv(.Inline) ?gpu.Proc);
     assertDecl(T, "deviceCreateBindGroup", fn (device: *gpu.Device, descriptor: *const gpu.BindGroup.Descriptor) callconv(.Inline) *gpu.BindGroup);
     assertDecl(T, "deviceCreateBindGroupLayout", fn (device: *gpu.Device, descriptor: *const gpu.BindGroupLayout.Descriptor) callconv(.Inline) *gpu.BindGroupLayout);
     assertDecl(T, "deviceCreateBuffer", fn (device: *gpu.Device, descriptor: *const gpu.Buffer.Descriptor) callconv(.Inline) *gpu.Buffer);
@@ -92,12 +135,9 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "deviceCreateErrorExternalTexture", fn (device: *gpu.Device) callconv(.Inline) *gpu.ExternalTexture);
     assertDecl(T, "deviceCreateErrorTexture", fn (device: *gpu.Device, descriptor: *const gpu.Texture.Descriptor) callconv(.Inline) *gpu.Texture);
     assertDecl(T, "deviceCreateExternalTexture", fn (device: *gpu.Device, external_texture_descriptor: *const gpu.ExternalTexture.Descriptor) callconv(.Inline) *gpu.ExternalTexture);
-    assertDecl(T, "deviceCreatePipelineLayout", fn (device: *gpu.Device, pipeline_layout_descriptor: *const gpu.PipelineLayout.Descriptor) callconv(.Inline) *gpu.PipelineLayout);
     assertDecl(T, "deviceCreateQuerySet", fn (device: *gpu.Device, descriptor: *const gpu.QuerySet.Descriptor) callconv(.Inline) *gpu.QuerySet);
     assertDecl(T, "deviceCreateRenderBundleEncoder", fn (device: *gpu.Device, descriptor: *const gpu.RenderBundleEncoder.Descriptor) callconv(.Inline) *gpu.RenderBundleEncoder);
-    assertDecl(T, "deviceCreateRenderPipeline", fn (device: *gpu.Device, descriptor: *const gpu.RenderPipeline.Descriptor) callconv(.Inline) *gpu.RenderPipeline);
-    assertDecl(T, "deviceCreateRenderPipelineAsync", fn (device: *gpu.Device, descriptor: *const gpu.RenderPipeline.Descriptor, callback: gpu.CreateRenderPipelineAsyncCallback, userdata: ?*anyopaque) callconv(.Inline) void);
-    // TODO(self-hosted): this cannot be marked as inline for some reason.
+    // TODO(self-hosted): this cannot be marked as inline for some reason:
     // https://github.com/ziglang/zig/issues/12545
     assertDecl(T, "deviceCreateSampler", fn (device: *gpu.Device, descriptor: ?*const gpu.Sampler.Descriptor) *gpu.Sampler);
     assertDecl(T, "deviceCreateShaderModule", fn (device: *gpu.Device, descriptor: *const gpu.ShaderModule.Descriptor) callconv(.Inline) *gpu.ShaderModule);
@@ -121,24 +161,29 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "machDeviceWaitForCommandsToBeScheduled", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "deviceReference", fn (device: *gpu.Device) callconv(.Inline) void);
     assertDecl(T, "deviceRelease", fn (device: *gpu.Device) callconv(.Inline) void);
+
+    // gpu.ExternalTexture
     assertDecl(T, "externalTextureDestroy", fn (external_texture: *gpu.ExternalTexture) callconv(.Inline) void);
     assertDecl(T, "externalTextureSetLabel", fn (external_texture: *gpu.ExternalTexture, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "externalTextureReference", fn (external_texture: *gpu.ExternalTexture) callconv(.Inline) void);
     assertDecl(T, "externalTextureRelease", fn (external_texture: *gpu.ExternalTexture) callconv(.Inline) void);
+
+    // gpu.Instance
     assertDecl(T, "instanceCreateSurface", fn (instance: *gpu.Instance, descriptor: *const gpu.Surface.Descriptor) callconv(.Inline) *gpu.Surface);
     assertDecl(T, "instanceProcessEvents", fn (instance: *gpu.Instance) callconv(.Inline) void);
     assertDecl(T, "instanceRequestAdapter", fn (instance: *gpu.Instance, options: ?*const gpu.RequestAdapterOptions, callback: gpu.RequestAdapterCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "instanceReference", fn (instance: *gpu.Instance) callconv(.Inline) void);
     assertDecl(T, "instanceRelease", fn (instance: *gpu.Instance) callconv(.Inline) void);
-    assertDecl(T, "pipelineLayoutSetLabel", fn (pipeline_layout: *gpu.PipelineLayout, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "pipelineLayoutReference", fn (pipeline_layout: *gpu.PipelineLayout) callconv(.Inline) void);
-    assertDecl(T, "pipelineLayoutRelease", fn (pipeline_layout: *gpu.PipelineLayout) callconv(.Inline) void);
+
+    // gpu.QuerySet
     assertDecl(T, "querySetDestroy", fn (query_set: *gpu.QuerySet) callconv(.Inline) void);
     assertDecl(T, "querySetGetCount", fn (query_set: *gpu.QuerySet) callconv(.Inline) u32);
     assertDecl(T, "querySetGetType", fn (query_set: *gpu.QuerySet) callconv(.Inline) gpu.QueryType);
     assertDecl(T, "querySetSetLabel", fn (query_set: *gpu.QuerySet, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "querySetReference", fn (query_set: *gpu.QuerySet) callconv(.Inline) void);
     assertDecl(T, "querySetRelease", fn (query_set: *gpu.QuerySet) callconv(.Inline) void);
+
+    // gpu.Queue
     assertDecl(T, "queueCopyTextureForBrowser", fn (queue: *gpu.Queue, source: *const gpu.ImageCopyTexture, destination: *const gpu.ImageCopyTexture, copy_size: *const gpu.Extent3D, options: *const gpu.CopyTextureForBrowserOptions) callconv(.Inline) void);
     assertDecl(T, "queueOnSubmittedWorkDone", fn (queue: *gpu.Queue, signal_value: u64, callback: gpu.Queue.WorkDoneCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "queueSetLabel", fn (queue: *gpu.Queue, label: [*:0]const u8) callconv(.Inline) void);
@@ -147,9 +192,13 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "queueWriteTexture", fn (queue: *gpu.Queue, destination: *const gpu.ImageCopyTexture, data: *const anyopaque, data_size: usize, data_layout: *const gpu.Texture.DataLayout, write_size: *const gpu.Extent3D) callconv(.Inline) void);
     assertDecl(T, "queueReference", fn (queue: *gpu.Queue) callconv(.Inline) void);
     assertDecl(T, "queueRelease", fn (queue: *gpu.Queue) callconv(.Inline) void);
+
+    // gpu.RenderBundle
     assertDecl(T, "renderBundleSetLabel", fn (render_bundle: *gpu.RenderBundle, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "renderBundleReference", fn (render_bundle: *gpu.RenderBundle) callconv(.Inline) void);
     assertDecl(T, "renderBundleRelease", fn (render_bundle: *gpu.RenderBundle) callconv(.Inline) void);
+
+    // gpu.RenderBundleEncoder
     assertDecl(T, "renderBundleEncoderDraw", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderDrawIndexed", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, index_count: u32, instance_count: u32, first_index: u32, base_vertex: i32, first_instance: u32) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderDrawIndexedIndirect", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, indirect_buffer: *gpu.Buffer, indirect_offset: u64) callconv(.Inline) void);
@@ -158,13 +207,13 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "renderBundleEncoderInsertDebugMarker", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, marker_label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderPopDebugGroup", fn (render_bundle_encoder: *gpu.RenderBundleEncoder) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderPushDebugGroup", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, group_label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "renderBundleEncoderSetBindGroup", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, group_index: u32, group: *gpu.BindGroup, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderSetIndexBuffer", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, buffer: *gpu.Buffer, format: gpu.IndexFormat, offset: u64, size: u64) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderSetLabel", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "renderBundleEncoderSetPipeline", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderSetVertexBuffer", fn (render_bundle_encoder: *gpu.RenderBundleEncoder, slot: u32, buffer: *gpu.Buffer, offset: u64, size: u64) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderReference", fn (render_bundle_encoder: *gpu.RenderBundleEncoder) callconv(.Inline) void);
     assertDecl(T, "renderBundleEncoderRelease", fn (render_bundle_encoder: *gpu.RenderBundleEncoder) callconv(.Inline) void);
+
+    // gpu.RenderPassEncoder
     assertDecl(T, "renderPassEncoderBeginOcclusionQuery", fn (render_pass_encoder: *gpu.RenderPassEncoder, query_index: u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderDraw", fn (render_pass_encoder: *gpu.RenderPassEncoder, vertex_count: u32, instance_count: u32, first_vertex: u32, first_instance: u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderDrawIndexed", fn (render_pass_encoder: *gpu.RenderPassEncoder, index_count: u32, instance_count: u32, first_index: u32, base_vertex: i32, first_instance: u32) callconv(.Inline) void);
@@ -176,11 +225,9 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "renderPassEncoderInsertDebugMarker", fn (render_pass_encoder: *gpu.RenderPassEncoder, marker_label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderPopDebugGroup", fn (render_pass_encoder: *gpu.RenderPassEncoder) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderPushDebugGroup", fn (render_pass_encoder: *gpu.RenderPassEncoder, group_label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "renderPassEncoderSetBindGroup", fn (render_pass_encoder: *gpu.RenderPassEncoder, group_index: u32, group: *gpu.BindGroup, dynamic_offset_count: usize, dynamic_offsets: ?[*]const u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetBlendConstant", fn (render_pass_encoder: *gpu.RenderPassEncoder, color: *const gpu.Color) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetIndexBuffer", fn (render_pass_encoder: *gpu.RenderPassEncoder, buffer: *gpu.Buffer, format: gpu.IndexFormat, offset: u64, size: u64) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetLabel", fn (render_pass_encoder: *gpu.RenderPassEncoder, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "renderPassEncoderSetPipeline", fn (render_pass_encoder: *gpu.RenderPassEncoder, pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetScissorRect", fn (render_pass_encoder: *gpu.RenderPassEncoder, x: u32, y: u32, width: u32, height: u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetStencilReference", fn (render_pass_encoder: *gpu.RenderPassEncoder, reference: u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderSetVertexBuffer", fn (render_pass_encoder: *gpu.RenderPassEncoder, slot: u32, buffer: *gpu.Buffer, offset: u64, size: u64) callconv(.Inline) void);
@@ -188,20 +235,24 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "renderPassEncoderWriteTimestamp", fn (render_pass_encoder: *gpu.RenderPassEncoder, query_set: *gpu.QuerySet, query_index: u32) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderReference", fn (render_pass_encoder: *gpu.RenderPassEncoder) callconv(.Inline) void);
     assertDecl(T, "renderPassEncoderRelease", fn (render_pass_encoder: *gpu.RenderPassEncoder) callconv(.Inline) void);
-    assertDecl(T, "renderPipelineGetBindGroupLayout", fn (render_pipeline: *gpu.RenderPipeline, group_index: u32) callconv(.Inline) *gpu.BindGroupLayout);
-    assertDecl(T, "renderPipelineSetLabel", fn (render_pipeline: *gpu.RenderPipeline, label: [*:0]const u8) callconv(.Inline) void);
-    assertDecl(T, "renderPipelineReference", fn (render_pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
-    assertDecl(T, "renderPipelineRelease", fn (render_pipeline: *gpu.RenderPipeline) callconv(.Inline) void);
+
+    // gpu.Sampler
     assertDecl(T, "samplerSetLabel", fn (sampler: *gpu.Sampler, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "samplerReference", fn (sampler: *gpu.Sampler) callconv(.Inline) void);
     assertDecl(T, "samplerRelease", fn (sampler: *gpu.Sampler) callconv(.Inline) void);
+
+    // gpu.ShaderModule
     assertDecl(T, "shaderModuleGetCompilationInfo", fn (shader_module: *gpu.ShaderModule, callback: gpu.CompilationInfoCallback, userdata: ?*anyopaque) callconv(.Inline) void);
     assertDecl(T, "shaderModuleSetLabel", fn (shader_module: *gpu.ShaderModule, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "shaderModuleReference", fn (shader_module: *gpu.ShaderModule) callconv(.Inline) void);
     assertDecl(T, "shaderModuleRelease", fn (shader_module: *gpu.ShaderModule) callconv(.Inline) void);
+
+    // gpu.SharedFence
     assertDecl(T, "sharedFenceExportInfo", fn (shared_fence: *gpu.SharedFence, info: *gpu.SharedFence.ExportInfo) callconv(.Inline) void);
     assertDecl(T, "sharedFenceReference", fn (shared_fence: *gpu.SharedFence) callconv(.Inline) void);
     assertDecl(T, "sharedFenceRelease", fn (shared_fence: *gpu.SharedFence) callconv(.Inline) void);
+
+    // gpu.SharedTextureMemory
     assertDecl(T, "sharedTextureMemoryBeginAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *const gpu.SharedTextureMemory.BeginAccessDescriptor) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryCreateTexture", fn (shared_texture_memory: *gpu.SharedTextureMemory, descriptor: *const gpu.Texture.Descriptor) callconv(.Inline) *gpu.Texture);
     assertDecl(T, "sharedTextureMemoryEndAccess", fn (shared_texture_memory: *gpu.SharedTextureMemory, texture: *gpu.Texture, descriptor: *gpu.SharedTextureMemory.EndAccessState) callconv(.Inline) void);
@@ -210,13 +261,19 @@ pub fn Interface(comptime T: type) type {
     assertDecl(T, "sharedTextureMemorySetLabel", fn (shared_texture_memory: *gpu.SharedTextureMemory, label: [*:0]const u8) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryReference", fn (shared_texture_memory: *gpu.SharedTextureMemory) callconv(.Inline) void);
     assertDecl(T, "sharedTextureMemoryRelease", fn (shared_texture_memory: *gpu.SharedTextureMemory) callconv(.Inline) void);
+
+    // gpu.Surface
     assertDecl(T, "surfaceReference", fn (surface: *gpu.Surface) callconv(.Inline) void);
     assertDecl(T, "surfaceRelease", fn (surface: *gpu.Surface) callconv(.Inline) void);
+
+    // gpu.SwapChain
     assertDecl(T, "swapChainGetCurrentTexture", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) ?*gpu.Texture);
     assertDecl(T, "swapChainGetCurrentTextureView", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) ?*gpu.TextureView);
     assertDecl(T, "swapChainPresent", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) void);
     assertDecl(T, "swapChainReference", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) void);
     assertDecl(T, "swapChainRelease", fn (swap_chain: *gpu.SwapChain) callconv(.Inline) void);
+
+    // gpu.Texture
     assertDecl(T, "textureCreateView", fn (texture: *gpu.Texture, descriptor: ?*const gpu.TextureView.Descriptor) callconv(.Inline) *gpu.TextureView);
     assertDecl(T, "textureDestroy", fn (texture: *gpu.Texture) callconv(.Inline) void);
     assertDecl(T, "textureGetDepthOrArrayLayers", fn (texture: *gpu.Texture) callconv(.Inline) u32);
