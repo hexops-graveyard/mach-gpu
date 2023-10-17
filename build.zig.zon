@@ -1,14 +1,24 @@
 .{
     .name = "mach-gpu",
     .version = "0.2.0",
+    .paths = .{
+        "examples",
+        "src",
+        "build.zig",
+        "build.zig.zon",
+        "LICENSE",
+        "LICENSE-APACHE",
+        "LICENSE-MIT",
+        "README.md",
+    },
     .dependencies = .{
         .mach_glfw = .{
-            .url = "https://pkg.machengine.org/mach-glfw/321efd4065b57e31d8ab0bce720852c1d680d443.tar.gz",
-            .hash = "122002e355cf42b8d257efc95229c9ee6be4cca189c1718f86179cb7c21225beeb75",
+            .url = "https://pkg.machengine.org/mach-glfw/16dc95cc7f74ebbbdd848d9a2c3cc4afc5717708.tar.gz",
+            .hash = "12202da6b8e9024c653f5d67f55a8065b401c42b3c08b69333d95400fe85d6019a59",
         },
         .mach_gpu_dawn = .{
-            .url = "https://pkg.machengine.org/mach-gpu-dawn/84b156dcb1fb500efc0e8302de4834adb22bc009.tar.gz",
-            .hash = "12200c2a99cff65ef438c9650f8a50063d074aadd031d16e7274f4b582d9259133d4",
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/ee2fb5066a774238a97ab18dc5620acce538d2e6.tar.gz",
+            .hash = "1220120328740b87b10f373b8b716d5fb7f73b437c770d18cc9012137328f2dd30e2",
         },
     },
 }
