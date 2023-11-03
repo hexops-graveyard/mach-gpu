@@ -103,8 +103,8 @@ pub const Device = opaque {
         context: anytype,
         comptime callback: fn (
             status: CreatePipelineAsyncStatus,
-            compute_pipeline: *ComputePipeline,
-            message: [*:0]const u8,
+            compute_pipeline: ?*ComputePipeline,
+            message: ?[*:0]const u8,
             ctx: @TypeOf(context),
         ) callconv(.Inline) void,
     ) void {
@@ -112,8 +112,8 @@ pub const Device = opaque {
         const Helper = struct {
             pub fn cCallback(
                 status: CreatePipelineAsyncStatus,
-                compute_pipeline: *ComputePipeline,
-                message: [*:0]const u8,
+                compute_pipeline: ?*ComputePipeline,
+                message: ?[*:0]const u8,
                 userdata: ?*anyopaque,
             ) callconv(.C) void {
                 callback(
@@ -166,16 +166,16 @@ pub const Device = opaque {
         comptime callback: fn (
             ctx: @TypeOf(context),
             status: CreatePipelineAsyncStatus,
-            pipeline: *RenderPipeline,
-            message: [*:0]const u8,
+            pipeline: ?*RenderPipeline,
+            message: ?[*:0]const u8,
         ) callconv(.Inline) void,
     ) void {
         const Context = @TypeOf(context);
         const Helper = struct {
             pub fn cCallback(
                 status: CreatePipelineAsyncStatus,
-                pipeline: *RenderPipeline,
-                message: [*:0]const u8,
+                pipeline: ?*RenderPipeline,
+                message: ?[*:0]const u8,
                 userdata: ?*anyopaque,
             ) callconv(.C) void {
                 callback(
