@@ -62,7 +62,7 @@ pub const Adapter = opaque {
     /// the caller.
     pub inline fn enumerateFeaturesOwned(adapter: *Adapter, allocator: std.mem.Allocator) ![]FeatureName {
         const count = adapter.enumerateFeatures(null);
-        var data = try allocator.alloc(FeatureName, count);
+        const data = try allocator.alloc(FeatureName, count);
         _ = adapter.enumerateFeatures(data.ptr);
         return data;
     }
