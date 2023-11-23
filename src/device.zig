@@ -234,7 +234,7 @@ pub const Device = opaque {
     /// the caller.
     pub inline fn enumerateFeaturesOwned(device: *Device, allocator: std.mem.Allocator) ![]FeatureName {
         const count = device.enumerateFeatures(null);
-        var data = try allocator.alloc(FeatureName, count);
+        const data = try allocator.alloc(FeatureName, count);
         _ = device.enumerateFeatures(data.ptr);
         return data;
     }
