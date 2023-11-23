@@ -17,8 +17,8 @@
             .hash = "1220533928f944fe59f6dd2807db71cd69108cc810101e627835c3abcc4afea4fb06",
         },
         .mach_gpu_dawn = .{
-            .url = "https://pkg.machengine.org/mach-gpu-dawn/16b234c1aae36469b71b640bcfbe4967f1086260.tar.gz",
-            .hash = "12209d26c597b7ce8be2b5d69389c43bbcf08144431c294782b30fdd0047e114e600",
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/5fe75438b824f92798c6d511d2502049f4a09c9f.tar.gz",
+            .hash = "1220c54d7621c0a12abefb0fbf61769eb1d054ae21990b85c079bf36ae5b8d4f1cbe",
         },
     },
 }
