@@ -72,7 +72,7 @@ pub const Adapter = opaque {
     }
 
     pub inline fn getLimits(adapter: *Adapter, limits: *SupportedLimits) bool {
-        return Impl.adapterGetLimits(adapter, limits);
+        return Impl.adapterGetLimits(adapter, limits) != 0;
     }
 
     pub inline fn getProperties(adapter: *Adapter, properties: *Adapter.Properties) void {
@@ -80,7 +80,7 @@ pub const Adapter = opaque {
     }
 
     pub inline fn hasFeature(adapter: *Adapter, feature: FeatureName) bool {
-        return Impl.adapterHasFeature(adapter, feature);
+        return Impl.adapterHasFeature(adapter, feature) != 0;
     }
 
     pub inline fn requestDevice(

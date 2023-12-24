@@ -248,7 +248,7 @@ pub const Device = opaque {
     }
 
     pub inline fn getLimits(device: *Device, limits: *SupportedLimits) bool {
-        return Impl.deviceGetLimits(device, limits);
+        return Impl.deviceGetLimits(device, limits) != 0;
     }
 
     pub inline fn getQueue(device: *Device) *Queue {
@@ -256,7 +256,7 @@ pub const Device = opaque {
     }
 
     pub inline fn hasFeature(device: *Device, feature: FeatureName) bool {
-        return Impl.deviceHasFeature(device, feature);
+        return Impl.deviceHasFeature(device, feature) != 0;
     }
 
     pub inline fn injectError(device: *Device, typ: ErrorType, message: [*:0]const u8) void {
