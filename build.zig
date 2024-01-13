@@ -10,11 +10,22 @@ pub fn build(b: *std.Build) !void {
     };
 
     const module = b.addModule("mach-gpu", .{
-        .source_file = .{ .path = "src/main.zig" },
+        .root_source_file = .{ .path = "src/main.zig" },
     });
+    gpu_dawn.addPathsToModule(b, module, gpu_dawn_options);
+    module.addIncludePath(.{ .path = sdkPath("/src") });
 
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&(try testStep(b, optimize, target, .{ .gpu_dawn_options = gpu_dawn_options })).step);
+
+    const main_tests = b.addTest(.{
+        .name = "gpu-tests",
+        .root_source_file = .{ .path = sdkPath("/src/main.zig") },
+        .target = target,
+        .optimize = optimize,
+    });
+    try link(b, main_tests, .{ .gpu_dawn_options = gpu_dawn_options });
+    b.installArtifact(main_tests);
+    test_step.dependOn(&b.addRunArtifact(main_tests).step);
 
     const example = b.addExecutable(.{
         .name = "gpu-hello-triangle",
@@ -22,7 +33,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    example.addModule("gpu", module);
+    example.root_module.addImport("gpu", module);
 
     try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
 
@@ -31,14 +42,8 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    example.addModule("glfw", glfw_dep.module("mach-glfw"));
-    @import("mach_glfw").link(
-        b.dependency("mach_glfw", .{
-            .target = target,
-            .optimize = optimize,
-        }).builder,
-        example,
-    );
+    example.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
+    @import("mach_glfw").addPaths(example);
 
     b.installArtifact(example);
 
@@ -48,28 +53,16 @@ pub fn build(b: *std.Build) !void {
     example_run_step.dependOn(&example_run_cmd.step);
 }
 
-pub fn testStep(b: *std.Build, optimize: std.builtin.OptimizeMode, target: std.zig.CrossTarget, options: Options) !*std.build.RunStep {
-    const main_tests = b.addTest(.{
-        .name = "gpu-tests",
-        .root_source_file = .{ .path = sdkPath("/src/main.zig") },
-        .target = target,
-        .optimize = optimize,
-    });
-    try link(b, main_tests, options);
-    b.installArtifact(main_tests);
-    return b.addRunArtifact(main_tests);
-}
-
 pub const Options = struct {
     gpu_dawn_options: gpu_dawn.Options = .{},
 };
 
-pub fn link(b: *std.Build, step: *std.build.CompileStep, options: Options) !void {
-    if (step.target.toTarget().cpu.arch != .wasm32) {
+pub fn link(b: *std.Build, step: *std.Build.Step.Compile, options: Options) !void {
+    if (step.rootModuleTarget().cpu.arch != .wasm32) {
         gpu_dawn.link(
             b.dependency("mach_gpu_dawn", .{
-                .target = step.target,
-                .optimize = step.optimize,
+                .target = step.root_module.resolved_target.?,
+                .optimize = step.root_module.optimize.?,
             }).builder,
             step,
             options.gpu_dawn_options,
