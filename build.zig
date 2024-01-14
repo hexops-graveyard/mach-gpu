@@ -34,7 +34,6 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     example.root_module.addImport("gpu", module);
-
     try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
 
     // Link GLFW
