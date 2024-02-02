@@ -23,7 +23,7 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    try link(b, main_tests, .{ .gpu_dawn_options = gpu_dawn_options });
+    try link(b, main_tests, &main_tests.root_module, .{ .gpu_dawn_options = gpu_dawn_options });
     b.installArtifact(main_tests);
     test_step.dependOn(&b.addRunArtifact(main_tests).step);
 
@@ -34,7 +34,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     example.root_module.addImport("gpu", module);
-    try link(b, example, .{ .gpu_dawn_options = gpu_dawn_options });
+    try link(b, example, &example.root_module, .{ .gpu_dawn_options = gpu_dawn_options });
 
     // Link GLFW
     const glfw_dep = b.dependency("mach_glfw", .{
@@ -42,7 +42,6 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
     example.root_module.addImport("glfw", glfw_dep.module("mach-glfw"));
-    @import("mach_glfw").addPaths(example);
 
     b.installArtifact(example);
 
@@ -56,7 +55,7 @@ pub const Options = struct {
     gpu_dawn_options: gpu_dawn.Options = .{},
 };
 
-pub fn link(b: *std.Build, step: *std.Build.Step.Compile, options: Options) !void {
+pub fn link(b: *std.Build, step: *std.Build.Step.Compile, mod: *std.Build.Module, options: Options) !void {
     if (step.rootModuleTarget().cpu.arch != .wasm32) {
         gpu_dawn.link(
             b.dependency("mach_gpu_dawn", .{
@@ -64,6 +63,7 @@ pub fn link(b: *std.Build, step: *std.Build.Step.Compile, options: Options) !voi
                 .optimize = step.root_module.optimize.?,
             }).builder,
             step,
+            mod,
             options.gpu_dawn_options,
         );
         step.addCSourceFile(.{ .file = .{ .path = sdkPath("/src/mach_dawn.cpp") }, .flags = &.{"-std=c++17"} });
