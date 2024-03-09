@@ -15,7 +15,7 @@ pub inline fn printUnhandledErrorCallback(_: void, typ: gpu.ErrorType, message: 
     std.os.exit(1);
 }
 
-fn getEnvVarOwned(allocator: std.mem.Allocator, key: []const u8) error{ OutOfMemory, InvalidUtf8 }!?[]u8 {
+fn getEnvVarOwned(allocator: std.mem.Allocator, key: []const u8) error{ OutOfMemory, InvalidUtf8, InvalidWtf8 }!?[]u8 {
     return std.process.getEnvVarOwned(allocator, key) catch |err| switch (err) {
         error.EnvironmentVariableNotFound => @as(?[]u8, null),
         else => |e| e,
