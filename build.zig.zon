@@ -13,12 +13,12 @@
     },
     .dependencies = .{
         .mach_glfw = .{
-            .url = "https://pkg.machengine.org/mach-glfw/63da35e57c3695a787b927e69e4140eb74ffc234.tar.gz",
-            .hash = "1220fda87b59df6353864651cdd3943f1159d8d517a45cd67bed493fe6c0a0c78c17",
+            .url = "https://pkg.machengine.org/mach-glfw/26e8af73d7d4fbdac3ff60492c44294fc0d139b7.tar.gz",
+            .hash = "12206b8eddf19167cc9ec83f353f97b8b9cdc2bc8c082fe33df6de11c1f00661bc8d",
         },
         .mach_gpu_dawn = .{
-            .url = "https://pkg.machengine.org/mach-gpu-dawn/a0b34025ff53512d65867f2a18846868c69bb33b.tar.gz",
-            .hash = "1220f54fb0f58e4d434d3ca475281b8feda609905bd841b986a19a080747f7a4a965",
+            .url = "https://pkg.machengine.org/mach-gpu-dawn/cce4d19945ca6102162b0cbbc546648edb38dc41.tar.gz",
+            .hash = "1220a6e3f4772fed665bb5b1792cf5cff8ac51af42a57ad8d276e394ae19f310a92e",
         },
     },
 }
