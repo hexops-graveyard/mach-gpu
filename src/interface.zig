@@ -9,7 +9,10 @@ pub const Impl = blk: {
         break :blk StubInterface;
     } else {
         const root = @import("root");
-        if (!@hasDecl(root, "GPUInterface")) @compileError("expected to find `pub const GPUInterface = T;` in root file");
+
+        // Default to Dawn implementation of gpu.Interface if none was specified.
+        if (!@hasDecl(root, "GPUInterface")) break :blk gpu.Interface(@import("dawn_impl.zig").Interface);
+
         _ = gpu.Interface(root.GPUInterface); // verify the type
         break :blk root.GPUInterface;
     }
