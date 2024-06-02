@@ -10,16 +10,16 @@ pub fn build(b: *std.Build) !void {
     };
 
     const module = b.addModule("mach-gpu", .{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
     });
     gpu_dawn.addPathsToModule(b, module, gpu_dawn_options);
-    module.addIncludePath(.{ .path = sdkPath("/src") });
+    module.addIncludePath(b.path("src"));
 
     const test_step = b.step("test", "Run library tests");
 
     const main_tests = b.addTest(.{
         .name = "gpu-tests",
-        .root_source_file = .{ .path = sdkPath("/src/main.zig") },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -29,7 +29,7 @@ pub fn build(b: *std.Build) !void {
 
     const example = b.addExecutable(.{
         .name = "gpu-hello-triangle",
-        .root_source_file = .{ .path = "examples/main.zig" },
+        .root_source_file = b.path("examples/main.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -66,8 +66,8 @@ pub fn link(b: *std.Build, step: *std.Build.Step.Compile, mod: *std.Build.Module
             mod,
             options.gpu_dawn_options,
         );
-        step.addCSourceFile(.{ .file = .{ .path = sdkPath("/src/mach_dawn.cpp") }, .flags = &.{"-std=c++17"} });
-        step.addIncludePath(.{ .path = sdkPath("/src") });
+        step.addCSourceFile(.{ .file = b.path("src/mach_dawn.cpp"), .flags = &.{"-std=c++17"} });
+        step.addIncludePath(b.path("src"));
     }
 }
 
